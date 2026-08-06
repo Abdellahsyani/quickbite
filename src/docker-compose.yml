@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:17
+    container-name: quickbite-db
+    restart: unless-stopped
+    environement:
+      DB_USER: ${DB_USER}
+      DB_PASSWD: ${PASSWD}
+      POSTGRES_DB: ${DB_NAME}
+
+    ports:
+      - "${PORT}:5501"
+
+    volumes:
+      - postgres_data:/var/lib/postresql/data
+
+  volumes:
+    postgres_data:
