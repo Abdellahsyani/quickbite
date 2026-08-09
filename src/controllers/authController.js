@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../config/db.js";
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   try {
@@ -63,8 +64,14 @@ export const login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(400).json({ messgae: "Invalid email or password" });
     }
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || "1d" },
+    );
     return res.status(200).json({
       message: "Login Successful",
+      token,
       user: {
         id: user.id,
         name: user.name,
