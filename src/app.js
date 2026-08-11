@@ -17,6 +17,7 @@ app.listen(PORT, () => {
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", userRoutes);
+app.use("/api/menu", menuRoutes);
 // app.use("/api/orders", orderRoutes);
 // app.use("/api/users", userRoutes);
 

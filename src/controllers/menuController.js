@@ -1,6 +1,6 @@
 import { prisma } from "../config/db.js";
 
-export const createMenu = async (req, res) => {
+export const createMenuItem = async (req, res) => {
   try {
     if (req.user.role !== "admin") {
       return res
@@ -22,5 +22,16 @@ export const createMenu = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Server Error", error: error.message });
+  }
+};
+
+export const getMenuItems = async (req, res) => {
+  try {
+    const MenuItem = await prisma.MenuItem.findMany();
+    return res.status(200).json(MenuItem);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
