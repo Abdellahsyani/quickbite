@@ -34,3 +34,14 @@ model Order {
 
   @@map("orders")
 }
+
+model MenuItem {
+  id Int @id @default(autoincrement())
+  name String
+  description String?
+  price Float
+  category String
+  isAvailable Boolean @default(true)
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
