@@ -86,3 +86,28 @@ export const updateMenuItem = async (req, res) => {
       .json({ message: "Server error", error: error.message });
   }
 };
+
+export const deleteMenuitem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const itemId = parseInt(id, 10);
+    if (isNaN(itemId)) {
+      return res.status(400).json({ message: "Invalid Item ID" });
+    }
+    const deletedItem = await prisma.MenuItem.delete({
+      where: {
+        id: itemId,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: "Item deleted successfully", item: deletedItem });
+  } catch (error) {
+    if (error === "P2025") {
+      return res.status(404).json({ message: "Menu item not found" });
+    }
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
