@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import { connectDB, disconnectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import menuRoutes from "./routes/menuRoutes.js";
 
 config();
 connectDB();

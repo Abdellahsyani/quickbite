@@ -15,7 +15,7 @@ export const createMenuItem = async (req, res) => {
         .json({ message: "Name, Price,, and category are required" });
     }
     const newItem = await prisma.menuItem.create({
-      date: { name, description, price: paseFloat(price), category },
+      data: { name, description, price: parseFloat(price), category },
     });
     return res.status(201).json({ message: "Menu Item created" });
   } catch (error) {
@@ -27,7 +27,7 @@ export const createMenuItem = async (req, res) => {
 
 export const getMenuItems = async (req, res) => {
   try {
-    const MenuItem = await prisma.MenuItem.findMany();
+    const MenuItem = await prisma.menuItem.findMany();
     return res.status(200).json(MenuItem);
   } catch (error) {
     return res
@@ -39,9 +39,13 @@ export const getMenuItems = async (req, res) => {
 export const getMenuItembyId = async (req, res) => {
   try {
     const { id } = req.params;
-    const MenuItemId = await prisma.MenuItem.findUnique({
+    const itemId = parseInt(id, 10);
+    if (isNaN(itemId)) {
+      return res.status(404).json({ message: "Invalid menu item ID" });
+    }
+    const MenuItemId = await prisma.menuItem.findUnique({
       where: {
-        id: id,
+        id: itemId,
       },
     });
     if (!MenuItemId) {
@@ -64,7 +68,7 @@ export const updateMenuItem = async (req, res) => {
     if (isNaN(itemId)) {
       return res.status(400).json({ message: "Invalid menu item ID" });
     }
-    const updateItem = await prisma.MenuItem.update({
+    const updateItem = await prisma.menuItem.update({
       where: { id: itemI },
       data: {
         ...(name && { name }),
@@ -94,7 +98,7 @@ export const deleteMenuitem = async (req, res) => {
     if (isNaN(itemId)) {
       return res.status(400).json({ message: "Invalid Item ID" });
     }
-    const deletedItem = await prisma.MenuItem.delete({
+    const deletedItem = await prisma.menuItem.delete({
       where: {
         id: itemId,
       },

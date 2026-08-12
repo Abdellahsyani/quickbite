@@ -43,5 +43,5 @@ model MenuItem {
   category String
   isAvailable Boolean @default(true)
   createdAt DateTime @default(now())
-  updateAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }

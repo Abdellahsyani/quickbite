@@ -6,7 +6,7 @@ import {
   updateMenuItem,
   deleteMenuitem,
 } from "../controllers/menuController.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { authorizeRole } from "../middlewares/authorizeRole.js";
 
 const router = Router();
@@ -16,8 +16,13 @@ router.get("/", getMenuItems);
 router.get("/:id", getMenuItembyId);
 
 // admin-only routes (token + admin role required)
-router.post("/", authMiddleware, authorizeRole("admin"), createMenuItem);
-router.put("/:id", authMiddleware, authorizeRole("admin"), updateMenuItem);
-router.delete("/:id", authMiddleware, authorizeRole("admin"), deleteMenuitem);
+router.post("/", authenticateToken, authorizeRole("admin"), createMenuItem);
+router.put("/:id", authenticateToken, authorizeRole("admin"), updateMenuItem);
+router.delete(
+  "/:id",
+  authenticateToken,
+  authorizeRole("admin"),
+  deleteMenuitem,
+);
 
 export default router;
