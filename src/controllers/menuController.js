@@ -41,7 +41,7 @@ export const getMenuItembyId = async (req, res) => {
     const { id } = req.params;
     const itemId = parseInt(id, 10);
     if (isNaN(itemId)) {
-      return res.status(404).json({ message: "Invalid menu item ID" });
+      return res.status(400).json({ message: "Invalid menu item ID" });
     }
     const MenuItemId = await prisma.menuItem.findUnique({
       where: {
@@ -65,11 +65,14 @@ export const updateMenuItem = async (req, res) => {
     const { id } = req.params;
 
     const itemId = parseInt(id, 10);
+    if (price !== undefined && isNaN(parseFloat(price))) {
+      return res.status(400).json({ message: "Price must be a valid number" });
+    }
     if (isNaN(itemId)) {
       return res.status(400).json({ message: "Invalid menu item ID" });
     }
     const updateItem = await prisma.menuItem.update({
-      where: { id: itemI },
+      where: { id: itemId },
       data: {
         ...(name && { name }),
         ...(description !== undefined && { description }),
@@ -107,7 +110,7 @@ export const deleteMenuitem = async (req, res) => {
       .status(200)
       .json({ message: "Item deleted successfully", item: deletedItem });
   } catch (error) {
-    if (error === "P2025") {
+    if (error.code === "P2025") {
       return res.status(404).json({ message: "Menu item not found" });
     }
     return res
