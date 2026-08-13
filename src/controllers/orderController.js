@@ -14,11 +14,13 @@ export const createOrder = async (req, res) => {
     const itemIds = items.map((item) => item.menuItemId);
     const dbMenuItems = await prisma.menuItem.findMany({
       where: {
-        { id: { in: itemIds } },
+        id: { in: itemIds },
       },
     });
     if (dbMenuItems.length !== itemIds.length) {
-      return res.status(400).json({message:"One or more menu items do not exists"});
+      return res
+        .status(400)
+        .json({ message: "One or more menu items do not exists" });
     }
     let totalPrice = 0;
     const orderItemsData = [];
@@ -34,7 +36,7 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    const  newOrder = await prisma.order.create({
+    const newOrder = await prisma.order.create({
       data: {
         userId,
         totalPrice: parseFloat(totalPrice.toFixed(2)),
@@ -44,10 +46,33 @@ export const createOrder = async (req, res) => {
       },
       include: {
         items: true,
-      }
+      },
     });
-    return res.status(201).json({message:"Order placed successfully", order: newOrder});
+    return res
+      .status(201)
+      .json({ message: "Order placed successfully", order: newOrder });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
 
+export const getMyorder = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const orders = await prisma.orders.findMany({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            menuItem: { select: { name: true, category: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return res.status(200).json(orders);
   } catch (error) {
     return res
       .status(500)
