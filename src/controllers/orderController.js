@@ -1,1 +1,56 @@
 import { prisma } from "../config/db.js";
+
+export const createOrder = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { items } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Order must containe at least one item" });
+    }
+
+    const itemIds = items.map((item) => item.menuItemId);
+    const dbMenuItems = await prisma.menuItem.findMany({
+      where: {
+        { id: { in: itemIds } },
+      },
+    });
+    if (dbMenuItems.length !== itemIds.length) {
+      return res.status(400).json({message:"One or more menu items do not exists"});
+    }
+    let totalPrice = 0;
+    const orderItemsData = [];
+    for (const item of items) {
+      const menuItem = dbMenuItems.find((m) => m.id === item.menuItemId);
+      const itemTotal = menuItem.price * item.quantity;
+      totalPrice += itemTotal;
+
+      orderItemsData.push({
+        menuItemId: menuItem.id,
+        quantity: item.quantity,
+        price: menuItem.price,
+      });
+    }
+
+    const  newOrder = await prisma.order.create({
+      data: {
+        userId,
+        totalPrice: parseFloat(totalPrice.toFixed(2)),
+        items: {
+          create: orderItemsData,
+        },
+      },
+      include: {
+        items: true,
+      }
+    });
+    return res.status(201).json({message:"Order placed successfully", order: newOrder});
+
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
