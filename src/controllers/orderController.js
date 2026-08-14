@@ -79,3 +79,20 @@ export const getMyorder = async (req, res) => {
       .json({ message: "Server error", error: error.message });
   }
 };
+
+export const getAllOrders = async (req, res) => {
+  try {
+    const allOrders = await prisma.orders.findMany();
+    return res.status(200).json(allOrders);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+export const updateOrderStatus = async (req, res) => {
+  try {
+
+  }
+}

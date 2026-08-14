@@ -2,11 +2,11 @@ import { prisma } from "../config/db.js";
 
 export const createMenuItem = async (req, res) => {
   try {
-    if (req.user.role !== "admin") {
-      return res
-        .status(403)
-        .json({ message: "Access denied. Admin rights required" });
-    }
+    // if (req.user.role !== "admin") {
+    //   return res
+    //     .status(403)
+    //     .json({ message: "Access denied. Admin rights required" });
+    // }
 
     const { name, description, price, category } = req.body;
     if (!name || !price || !category) {
