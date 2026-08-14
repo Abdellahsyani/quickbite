@@ -61,7 +61,7 @@ export const createOrder = async (req, res) => {
 export const getMyOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const orders = await prisma.orders.findMany({
+    const orders = await prisma.order.findMany({
       where: { userId },
       include: {
         items: {
@@ -82,7 +82,7 @@ export const getMyOrder = async (req, res) => {
 
 export const getAllOrders = async (req, res) => {
   try {
-    const allOrders = await prisma.orders.findMany({
+    const allOrders = await prisma.order.findMany({
       include: {
         user: {
           select: { id: true, name: true, email: true },
@@ -107,18 +107,21 @@ export const getAllOrders = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
   try {
-    const { state } = req.body;
+    const { status } = req.body;
     const { id } = req.params;
     const orderId = parseInt(id, 10);
 
     if (isNaN(orderId)) {
       return res.status(400).json({ message: "Invalid Order Id" });
     }
+    console.log("------------------------");
+    console.log(req.body);
+    console.log("------------------------");
     if (
-      state !== "PENDING" &&
-      state !== "PREPARING" &&
-      state !== "COMPLETED" &&
-      state !== "CANCELLED"
+      status !== "PENDING" &&
+      status !== "PREPARING" &&
+      status !== "COMPLETED" &&
+      status !== "CANCELLED"
     ) {
       return res.status(400).json({ message: "Not a valide status" });
     }
