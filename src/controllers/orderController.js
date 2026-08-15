@@ -114,9 +114,6 @@ export const updateOrderStatus = async (req, res) => {
     if (isNaN(orderId)) {
       return res.status(400).json({ message: "Invalid Order Id" });
     }
-    console.log("------------------------");
-    console.log(req.body);
-    console.log("------------------------");
     if (
       status !== "PENDING" &&
       status !== "PREPARING" &&
