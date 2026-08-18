@@ -13,16 +13,23 @@ const router = Router();
 
 // Public routes (no token required)
 router.get("/", getMenuItems);
-router.get("/:id", getMenuItembyId);
+// router.get("/:id", getMenuItembyId);
 
 // admin-only routes (token + admin role required)
-router.post("/", authenticateToken, authorizeRole("admin"), createMenuItem);
-router.put("/:id", authenticateToken, authorizeRole("admin"), updateMenuItem);
-router.delete(
-  "/:id",
-  authenticateToken,
-  authorizeRole("admin"),
-  deleteMenuitem,
-);
+// router.post("/", authenticateToken, authorizeRole("admin"), createMenuItem);
+// router.put("/:id", authenticateToken, authorizeRole("admin"), updateMenuItem);
+// router.delete(
+//   "/:id",
+//   authenticateToken,
+//   authorizeRole("admin"),
+//   deleteMenuitem,
+// );
+
+router
+  .route("/:id")
+  .get(getMenuItemById)
+  .put(authenticateToken, authorizeRole("admin"), updateMenuItem)
+  .patch(authenticateToken, authorizeRole("admin"), updateMenuItem)
+  .delete(authenticateToken, authorizeRole("admin"), deleteMenuItem);
 
 export default router;
