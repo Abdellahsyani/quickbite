@@ -11,16 +11,36 @@ export const createOrder = async (req, res) => {
         .json({ message: "Order must containe at least one item" });
     }
 
-    const itemIds = items.map((item) => item.menuItemId);
+    for (const item of items) {
+      if (
+        !item.quantity ||
+        item.quantity <= 0 ||
+        !Number.isInteger(item.quantity)
+      ) {
+        return res
+          .status(400)
+          .json({ message: "Each item must have a positive integer quantity" });
+      }
+    }
+
+    const uniqueItemIds = [...new Set(items.map((item) => item.menuItemId))];
     const dbMenuItems = await prisma.menuItem.findMany({
       where: {
-        id: { in: itemIds },
+        id: { in: uniqueItemIds },
       },
     });
     if (dbMenuItems.length !== itemIds.length) {
       return res
         .status(400)
         .json({ message: "One or more menu items do not exists" });
+    }
+    const unavailableItem = dbMenuItems.find((item) => !item.isAvailable);
+    if (unavailableItem) {
+      return res
+        .status(400)
+        .json({
+          message: `Item "{$unavailableItem.name}" is currently unvailable`,
+        });
     }
     let totalPrice = 0;
     const orderItemsData = [];
