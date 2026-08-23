@@ -36,7 +36,7 @@ export const getMenuItems = async (req, res) => {
   }
 };
 
-export const getMenuItembyId = async (req, res) => {
+export const getMenuItemById = async (req, res) => {
   try {
     const { id } = req.params;
     const itemId = parseInt(id, 10);
@@ -94,7 +94,7 @@ export const updateMenuItem = async (req, res) => {
   }
 };
 
-export const deleteMenuitem = async (req, res) => {
+export const deleteMenuItem = async (req, res) => {
   try {
     const { id } = req.params;
     const itemId = parseInt(id, 10);

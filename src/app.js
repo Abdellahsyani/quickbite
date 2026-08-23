@@ -12,15 +12,15 @@ connectDB();
 const app = express();
 const PORT = 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server is listening on http://localhost:${PORT}`);
-});
-
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", userRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/orders", orderRoutes);
 // app.use("/api/users", userRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server is listening on http://localhost:${PORT}`);
+});
 
 export default app;

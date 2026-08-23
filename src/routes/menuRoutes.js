@@ -2,9 +2,9 @@ import { Router } from "express";
 import {
   createMenuItem,
   getMenuItems,
-  getMenuItembyId,
+  getMenuItemById,
   updateMenuItem,
-  deleteMenuitem,
+  deleteMenuItem,
 } from "../controllers/menuController.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { authorizeRole } from "../middlewares/authorizeRole.js";
@@ -28,6 +28,7 @@ router.get("/", getMenuItems);
 router
   .route("/:id")
   .get(getMenuItemById)
+  .post("/", authenticateToken, authorizeRole("admin"), createMenuItem);
   .put(authenticateToken, authorizeRole("admin"), updateMenuItem)
   .patch(authenticateToken, authorizeRole("admin"), updateMenuItem)
   .delete(authenticateToken, authorizeRole("admin"), deleteMenuItem);
