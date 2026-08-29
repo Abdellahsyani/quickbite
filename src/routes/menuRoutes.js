@@ -11,24 +11,16 @@ import { authorizeRole } from "../middlewares/authorizeRole.js";
 
 const router = Router();
 
-// Public routes (no token required)
-router.get("/", getMenuItems);
-// router.get("/:id", getMenuItembyId);
+// Routes for "/" (GET all items, POST create item)
+router
+  .route("/")
+  .get(getMenuItems)
+  .post(authenticateToken, authorizeRole("admin"), createMenuItem);
 
-// admin-only routes (token + admin role required)
-// router.post("/", authenticateToken, authorizeRole("admin"), createMenuItem);
-// router.put("/:id", authenticateToken, authorizeRole("admin"), updateMenuItem);
-// router.delete(
-//   "/:id",
-//   authenticateToken,
-//   authorizeRole("admin"),
-//   deleteMenuitem,
-// );
-
+// Routes for "/:id" (GET single item, PUT/PATCH update, DELETE remove)
 router
   .route("/:id")
   .get(getMenuItemById)
-  .post("/", authenticateToken, authorizeRole("admin"), createMenuItem);
   .put(authenticateToken, authorizeRole("admin"), updateMenuItem)
   .patch(authenticateToken, authorizeRole("admin"), updateMenuItem)
   .delete(authenticateToken, authorizeRole("admin"), deleteMenuItem);
