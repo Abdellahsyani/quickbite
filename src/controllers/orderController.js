@@ -29,18 +29,16 @@ export const createOrder = async (req, res) => {
         id: { in: uniqueItemIds },
       },
     });
-    if (dbMenuItems.length !== itemIds.length) {
+    if (dbMenuItems.length !== uniqueItemIds.length) {
       return res
         .status(400)
         .json({ message: "One or more menu items do not exists" });
     }
     const unavailableItem = dbMenuItems.find((item) => !item.isAvailable);
     if (unavailableItem) {
-      return res
-        .status(400)
-        .json({
-          message: `Item "{$unavailableItem.name}" is currently unvailable`,
-        });
+      return res.status(400).json({
+        message: `Item {$unavailableItem.name} is currently unvailable`,
+      });
     }
     let totalPrice = 0;
     const orderItemsData = [];
