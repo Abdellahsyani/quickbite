@@ -2,15 +2,14 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, UtensilsCrossed, Settings, LogOut } from 'lucide-react';
 
 export default function Sidebar() {
-  
+
   const navClass = ({ isActive }) =>
-    `flex items-center gap-3 p-3 rounded-lg transition-colors ${
-      isActive ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+    `flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
     }`;
 
   return (
     <aside className="w-64 bg-gray-900 text-white h-screen flex flex-col">
-      
+
       {/* 1. Brand Header */}
       <div className="p-6 border-b border-gray-800">
         <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -46,7 +45,7 @@ export default function Sidebar() {
           Logout
         </button>
       </div>
-      
+
     </aside>
   );
 }
