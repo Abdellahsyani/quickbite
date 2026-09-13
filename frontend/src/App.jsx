@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
+import LiveOrders from './pages/LiveOrders'; // <-- 1. Imported here
 
 export default function App() {
   return (
@@ -7,26 +8,16 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
 
-          {/* This shows up when you click "Live Orders" */}
-          <Route index element={
-            <div className="p-8">
-              <h1 className="text-3xl font-bold">Live Orders Board</h1>
-            </div>
-          } />
+          {/* 2. Linked here! */}
+          <Route index element={<LiveOrders />} />
 
-          {/* This shows up when you click "Menu Catalog" */}
+          {/* We will leave this one alone until we build the Menu page later */}
           <Route path="menu" element={
             <div className="p-8">
               <h1 className="text-3xl font-bold">Menu Manager</h1>
             </div>
           } />
 
-          {/* This shows up when access settings*/}
-          <Route path="settings" element={
-            <div className="p-8">
-              <h1 className="text-3xl font-bold">Settings page</h1>
-            </div>
-          } />
         </Route>
       </Routes>
     </BrowserRouter>
