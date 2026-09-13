@@ -6,14 +6,14 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          
+
           {/* This shows up when you click "Live Orders" */}
           <Route index element={
             <div className="p-8">
               <h1 className="text-3xl font-bold">Live Orders Board</h1>
             </div>
           } />
-          
+
           {/* This shows up when you click "Menu Catalog" */}
           <Route path="menu" element={
             <div className="p-8">
@@ -21,6 +21,12 @@ export default function App() {
             </div>
           } />
 
+          {/* This shows up when access settings*/}
+          <Route path="settings" element={
+            <div className="p-8">
+              <h1 className="text-3xl font-bold">Settings page</h1>
+            </div>
+          } />
         </Route>
       </Routes>
     </BrowserRouter>

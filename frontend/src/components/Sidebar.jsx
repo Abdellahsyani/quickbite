@@ -27,6 +27,10 @@ export default function Sidebar() {
           <UtensilsCrossed size={20} />
           Menu Catalog
         </NavLink>
+        <NavLink to="/settings" className={navClass}>
+          <Settings size={20} />
+          Settings
+        </NavLink>
       </nav>
 
       {/* 3. User Profile Footer */}
