@@ -1,39 +1,26 @@
 import { Pause } from 'lucide-react';
 import Card from '../components/Card';
 import OrderCard from '../components/OrderCard';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-
-const mockOrders = [
-  {
-    id: "104", table: "Table 7", time: "12:41 PM", elapsed: "3 min", status: "PENDING", total: "$28.50",
-    items: [
-      { name: "2x Double Cheeseburger", checked: false },
-      { name: "1x Large Fries", checked: false },
-      { name: "2x Coke Zero", checked: false }
-    ]
-  },
-  {
-    id: "102", table: "Table 11", time: "12:33 PM", elapsed: "11 min", status: "PREPARING", total: "$34.20",
-    items: [
-      { name: "3x Chicken Tenders", checked: true },
-      { name: "2x Sweet Potato Fries", checked: false }
-    ]
-  },
-  {
-    id: "100", table: "Table 2", time: "12:18 PM", elapsed: "26 min", status: "COMPLETED", total: "$41.00",
-    items: [
-      { name: "2x Fish & Chips", checked: true },
-      { name: "2x Lemonade", checked: true }
-    ]
-  }
-];
-
-// Filter our mock array into three separate lists
-const pending = mockOrders.filter(o => o.status === 'PENDING');
-const preparing = mockOrders.filter(o => o.status === 'PREPARING');
-const completed = mockOrders.filter(o => o.status === 'COMPLETED');
 
 export default function LiveOrders() {
+  const [orders, setOrder] = useState([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/orders')
+      .then(response => {
+        setOrder(response.data);
+      }).catch(error => {
+        console.log("Failed to fetch orders", error);
+      });
+  }, []);
+
+  const pending = orders.filter(o => o.status === 'PENDING');
+  const preparing = orders.filter(o => o.status === 'PREPARING');
+  const completed = orders.filter(o => o.status === 'COMPLETED');
+
   return (
     <div className="p-8">
 
@@ -91,7 +78,6 @@ export default function LiveOrders() {
 
 
           {/* We will map Preparing cards here */}
-
           {preparing.map(order => (
             <OrderCard key={order.id} order={order} />
           ))}
@@ -109,7 +95,6 @@ export default function LiveOrders() {
           </div>
 
           {/* We will map Completed cards here */}
-
           {completed.map(order => (
             <OrderCard key={order.id} order={order} />
           ))}
