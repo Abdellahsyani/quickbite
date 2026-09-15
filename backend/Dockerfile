@@ -12,6 +12,6 @@ RUN npx prisma generate
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 3000
 
 CMD ["sh", "-c", "npx prisma migrate deploy && npx nodemon src/app.js"]

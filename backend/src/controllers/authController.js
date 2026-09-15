@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   try {
-    const { email, name, password } = req.body;
+    const { email, name, password, role } = req.body;
 
     if (!name || !email || !password) {
       return res
@@ -26,6 +26,7 @@ export const register = async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        role: role || "user",
       },
       select: {
         id: true,
