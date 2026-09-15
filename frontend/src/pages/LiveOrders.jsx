@@ -9,7 +9,7 @@ export default function LiveOrders() {
   const [orders, setOrder] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/orders')
+    axios.get('http://localhost:3000/api/orders')
       .then(response => {
         setOrder(response.data);
       }).catch(error => {

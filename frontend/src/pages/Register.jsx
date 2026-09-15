@@ -25,7 +25,7 @@ export default function Register() {
     };
 
     // Send the data to your Express backend
-    axios.post('http://localhost:5000/api/auth/register', userData)
+    axios.post('http://localhost:3000/api/auth/register', userData)
       .then(response => {
         // Grab the JWT token and save it to the browser's hard drive
         const token = response.data.token;

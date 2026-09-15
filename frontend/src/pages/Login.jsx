@@ -15,7 +15,7 @@ export default function Login() {
     const credentials = { email, password };
 
     // Point this to your Express login route
-    axios.post('http://localhost:5000/api/auth/login', credentials)
+    axios.post('http://localhost:3000/api/auth/login', credentials)
       .then(response => {
         // 1. Grab the JWT from the backend
         const token = response.data.token;
