@@ -1,29 +1,30 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import LiveOrders from './pages/LiveOrders'; // <-- 1. Imported here
+import LiveOrders from './pages/LiveOrders';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Menu from './pages/Menu';
+import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* PUBLIC ROUTES (Anyone can access these) */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
-        <Route path="/" element={<Layout />}>
+        {/* PROTECTED ROUTES (Must have a token to enter) */}
+        <Route element={<ProtectedRoute />}> {/* <-- 2. Wrap the Layout */}
 
-          {/* 2. Linked here! */}
-          <Route index element={<LiveOrders />} />
-
-          {/* We will leave this one alone until we build the Menu page later */}
-          <Route path="menu" element={
-            <div className="p-8">
-              <h1 className="text-3xl font-bold">Menu Manager</h1>
-            </div>
-          } />
+          <Route path="/" element={<Layout />}>
+            <Route index element={<LiveOrders />} />
+            <Route path="menu" element={<Menu />} />
+          </Route>
 
         </Route>
+
       </Routes>
     </BrowserRouter>
   );
