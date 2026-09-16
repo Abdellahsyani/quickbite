@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Upload } from 'lucide-react';
 import api from '../api';
 
 export default function Menu() {
@@ -14,6 +14,10 @@ export default function Menu() {
     price: '',
     category: 'Burgers'
   });
+
+  // 2. add state for the image file and preview
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   // 2. Fetch function using async/await
   const fetchMenu = async () => {
@@ -32,14 +36,37 @@ export default function Menu() {
     fetchMenu();
   }, []);
 
+  // 3. ADDED: Function to handle when a user selects a file from their computer
+  const handleImageChange = (e) => {
+    const file = e.target.file[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   // 3. Handle Form Submission using async/await
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const submitData = new FormData();
+    submitData.append('name', formData.name);
+    submitData.append('description', formData.description);
+    submitData.append('price', formData.price);
+    submitData.append('category', formData.category);
+
+    if (imageFile) {
+      submitData.append('image', imageFile);
+    }
+
     try {
-      await api.post('/menu', formData);
+      await api.post('/menu', submitData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setIsModalOpen(false);
       setFormData({ name: '', description: '', price: '', category: 'Burgers' });
+      setImageFile(null);
+      setImagePreview(null);
       fetchMenu(); // Refresh the list
     } catch (error) {
       console.error("Failed to create item:", error);
@@ -113,18 +140,54 @@ export default function Menu() {
         </div>
       )}
 
-      {/* Add Item Modal Overlay */}
+      {/* The Add Item Modal Overlay */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-gray-900">Add New Item</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-700">
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setImagePreview(null);
+                  setImageFile(null);
+                }}
+                className="text-gray-400 hover:text-gray-700"
+              >
                 <X size={20} />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+              {/* 6. ADDED: The Image Upload Dropzone area inside the form */}
+              <div className="mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Item Image</label>
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl relative overflow-hidden group hover:border-blue-500 transition-colors">
+
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+                  ) : (
+                    <div className="space-y-1 text-center">
+                      <Upload className="mx-auto h-12 w-12 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                      <div className="flex text-sm text-gray-600 justify-center">
+                        <span className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
+                          <span>Upload a file</span>
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                    </div>
+                  )}
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
                 <input
@@ -179,7 +242,11 @@ export default function Menu() {
               <div className="flex gap-3 mt-4">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setImagePreview(null);
+                    setImageFile(null);
+                  }}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Cancel
