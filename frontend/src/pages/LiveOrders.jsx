@@ -2,14 +2,14 @@ import { Pause } from 'lucide-react';
 import Card from '../components/Card';
 import OrderCard from '../components/OrderCard';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 
 export default function LiveOrders() {
   const [orders, setOrder] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/orders')
+    api.get('/orders')
       .then(response => {
         setOrder(response.data);
       }).catch(error => {

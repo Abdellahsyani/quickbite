@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 export default function Register() {
   // 1. Memory for the form fields
@@ -25,7 +25,7 @@ export default function Register() {
     };
 
     // Send the data to your Express backend
-    axios.post('http://localhost:3000/api/auth/register', userData)
+    api.post('/auth/register', userData)
       .then(response => {
         // Grab the JWT token and save it to the browser's hard drive
         const token = response.data.token;
