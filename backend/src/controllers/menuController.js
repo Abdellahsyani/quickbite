@@ -14,8 +14,12 @@ export const createMenuItem = async (req, res) => {
         .status(400)
         .json({ message: "Name, Price,, and category are required" });
     }
+    let imageUrl = null;
+    if (req.file) {
+      imageUrl = `/uploads/menu/${req.file.filename}`;
+    }
     const newItem = await prisma.menuItem.create({
-      data: { name, description, price: parseFloat(price), category },
+      data: { name, description, price: parseFloat(price), category, imageUrl },
     });
     return res.status(201).json({ message: "Menu Item created" });
   } catch (error) {

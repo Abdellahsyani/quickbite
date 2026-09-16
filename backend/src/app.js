@@ -23,6 +23,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", userRoutes);
 app.use("/api/menu", menuRoutes);

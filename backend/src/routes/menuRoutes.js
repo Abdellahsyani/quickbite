@@ -8,6 +8,7 @@ import {
 } from "../controllers/menuController.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { authorizeRole } from "../middlewares/authorizeRole.js";
+import { upload } from "../middlewares/uploadMiddleware.js";
 
 const router = Router();
 
@@ -15,7 +16,12 @@ const router = Router();
 router
   .route("/")
   .get(getMenuItems)
-  .post(authenticateToken, authorizeRole("admin"), createMenuItem);
+  .post(
+    authenticateToken,
+    authorizeRole("admin"),
+    upload.single("image"),
+    createMenuItem,
+  );
 
 // Routes for "/:id" (GET single item, PUT/PATCH update, DELETE remove)
 router
