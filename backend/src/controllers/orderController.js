@@ -58,7 +58,6 @@ export const createOrder = async (req, res) => {
       data: {
         userId,
         table: table || "Takeout", // 2. SAVE the table
-        status: "pending", // 3. SET initial status for the Kanban board
         totalPrice: parseFloat(totalPrice.toFixed(2)),
         items: {
           create: orderItemsData,
@@ -73,6 +72,7 @@ export const createOrder = async (req, res) => {
       .status(201)
       .json({ message: "Order placed successfully", order: newOrder });
   } catch (error) {
+    console.log("BACK-END ERROR:", error);
     return res
       .status(500)
       .json({ message: "Server error", error: error.message });
