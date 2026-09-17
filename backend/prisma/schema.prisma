@@ -51,6 +51,9 @@ model Order {
   userId     Int         @map("user_id")
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   status     OrderStatus @default(PENDING)
+  
+  table      String      @default("Takeout") // ADD THIS BACK!
+  
   totalPrice Float       @map("total_price")
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @updatedAt @map("updated_at")
@@ -68,6 +71,8 @@ model OrderItem {
   menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
   quantity   Int
   price      Float
+  
+  notes      String?  @db.Text // ADD THIS BACK!
 
   @@map("order_items")
 }

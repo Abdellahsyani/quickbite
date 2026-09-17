@@ -3,7 +3,7 @@ import { prisma, OrderStatus } from "../config/db.js";
 export const createOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { items } = req.body;
+    const { items, table } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res
@@ -57,6 +57,8 @@ export const createOrder = async (req, res) => {
     const newOrder = await prisma.order.create({
       data: {
         userId,
+        table: table || "Takeout", // 2. SAVE the table
+        status: "pending", // 3. SET initial status for the Kanban board
         totalPrice: parseFloat(totalPrice.toFixed(2)),
         items: {
           create: orderItemsData,
@@ -66,6 +68,7 @@ export const createOrder = async (req, res) => {
         items: true,
       },
     });
+
     return res
       .status(201)
       .json({ message: "Order placed successfully", order: newOrder });
