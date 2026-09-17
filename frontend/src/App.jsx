@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Menu from './pages/Menu';
 import ProtectedRoute from './components/ProtectedRoute';
+import CustomerOrder from './pages/CustomerOrder';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<LiveOrders />} />
             <Route path="menu" element={<Menu />} />
+            <Route path="/order" element={<CustomerOrder />} />
           </Route>
 
         </Route>
