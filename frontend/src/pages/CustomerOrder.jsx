@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ShoppingBag, Minus, Plus, Trash2, Star, Flame, Leaf, Search } from 'lucide-react';
+import { ShoppingBag, Minus, Plus, Trash2, Star, Flame, Leaf, Search, CheckCircle } from 'lucide-react';
 import api from '../api';
 
 export default function CustomerOrder() {
@@ -10,6 +10,7 @@ export default function CustomerOrder() {
 
   const [orderType, setOrderType] = useState('dine_in');
   const [tableNumber, setTableNumber] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     api.get('/menu').then(res => {
@@ -68,9 +69,12 @@ export default function CustomerOrder() {
         items: formattedItems
       });
 
-      alert("Order sent to the kitchen!");
+      setShowSuccess('true');
       setCart([]);
       setTableNumber('');
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 3000);
     } catch (error) {
       console.error("Checkout failed:", error);
       alert(error.response?.data?.message || "Failed to send order.");
@@ -94,8 +98,8 @@ export default function CustomerOrder() {
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeCategory === cat
-                      ? 'bg-[#2563eb] text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-[#2563eb] text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
                   {cat}
@@ -209,6 +213,21 @@ export default function CustomerOrder() {
         </div>
       </div>
 
+      {showSuccess && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 backdrop-blur-sm">
+
+          {/* THE WHITE POPUP CARD */}
+          <div className="bg-white px-10 py-8 rounded-3xl shadow-2xl flex flex-col items-center transform transition-all scale-100 animate-in fade-in zoom-in-95 duration-200">
+
+            <div className="flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-5 shadow-inner">
+              <CheckCircle size={40} className="text-green-600" strokeWidth={2.5} />
+            </div>
+
+            <h2 className="text-3xl font-bold text-gray-900 text-center mb-2">Order Sent!</h2>
+            <p className="text-gray-500 text-center font-medium">The kitchen is preparing your food.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -287,6 +306,8 @@ function MenuCard({ item, onAdd }) {
           <Plus size={18} /> Add to Order
         </button>
       </div>
+
+
     </div>
   );
 }
