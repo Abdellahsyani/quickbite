@@ -4,18 +4,55 @@ import OrderCard from '../components/OrderCard';
 import { useState, useEffect } from 'react';
 import api from '../api';
 
-
 export default function LiveOrders() {
-  const [orders, setOrder] = useState([]);
+  // Renamed to setOrders (plural) to match the array
+  const [orders, setOrders] = useState([]);
 
-  useEffect(() => {
+  // 1. Fetch function extracted so we can reuse it
+  const fetchOrders = () => {
     api.get('/orders')
       .then(response => {
-        setOrder(response.data);
+        setOrders(response.data);
       }).catch(error => {
         console.log("Failed to fetch orders", error);
       });
+  };
+
+  // 2. Added the 5-second live-polling loop
+  useEffect(() => {
+    fetchOrders();
+    const intervalId = setInterval(fetchOrders, 5000);
+    return () => clearInterval(intervalId);
   }, []);
+
+  // 3. The function that physically moves the cards instantly
+  const handleMove = async (orderId, newStatus) => {
+    // Optimistic UI Update: Move it on screen immediately
+    setOrders(prevOrders =>
+      prevOrders.map(order =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
+
+    // Tell the database
+    try {
+      await api.patch(`/orders/${orderId}/status`, { status: newStatus });
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      fetchOrders(); // Revert screen if database fails
+    }
+  };
+
+  // 4. Clear completed orders from the screen
+  const handleClear = async (orderId) => {
+    setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
+    try {
+      await api.delete(`/orders/${orderId}`);
+    } catch (error) {
+      console.error("Failed to clear order:", error);
+      fetchOrders();
+    }
+  };
 
   const pending = orders.filter(o => o.status === 'PENDING');
   const preparing = orders.filter(o => o.status === 'PREPARING');
@@ -31,7 +68,7 @@ export default function LiveOrders() {
             Live Orders <span className="text-gray-400 font-normal">/ KDS</span>
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            6 active orders • Last refreshed just now
+            {orders.length} active orders • Last refreshed just now
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -56,12 +93,20 @@ export default function LiveOrders() {
               <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
               <h2 className="text-sm font-bold text-gray-500 tracking-wider">PENDING</h2>
             </div>
-            <span className="px-2 py-0.5 text-xs font-bold bg-yellow-100 text-yellow-800 rounded-full">2</span>
+            {/* FIXED: Dynamic counter instead of hardcoded 2 */}
+            <span className="px-2 py-0.5 text-xs font-bold bg-yellow-100 text-yellow-800 rounded-full">
+              {pending.length}
+            </span>
           </div>
 
-          {/* We will map Pending cards here */}
+          {/* Mapped Pending cards with onMove props */}
           {pending.map(order => (
-            <OrderCard key={order.id} order={order} />
+            <OrderCard
+              key={order.id}
+              order={order}
+              onMove={handleMove}
+              onClear={handleClear}
+            />
           ))}
         </div>
 
@@ -73,13 +118,20 @@ export default function LiveOrders() {
               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
               <h2 className="text-sm font-bold text-gray-500 tracking-wider">PREPARING</h2>
             </div>
-            <span className="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded-full">2</span>
+            {/* FIXED: Dynamic counter */}
+            <span className="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded-full">
+              {preparing.length}
+            </span>
           </div>
 
-
-          {/* We will map Preparing cards here */}
+          {/* Mapped Preparing cards with onMove props */}
           {preparing.map(order => (
-            <OrderCard key={order.id} order={order} />
+            <OrderCard
+              key={order.id}
+              order={order}
+              onMove={handleMove}
+              onClear={handleClear}
+            />
           ))}
         </div>
 
@@ -91,12 +143,20 @@ export default function LiveOrders() {
               <div className="w-2 h-2 rounded-full bg-green-500"></div>
               <h2 className="text-sm font-bold text-gray-500 tracking-wider">COMPLETED</h2>
             </div>
-            <span className="px-2 py-0.5 text-xs font-bold bg-green-100 text-green-800 rounded-full">2</span>
+            {/* FIXED: Dynamic counter */}
+            <span className="px-2 py-0.5 text-xs font-bold bg-green-100 text-green-800 rounded-full">
+              {completed.length}
+            </span>
           </div>
 
-          {/* We will map Completed cards here */}
+          {/* Mapped Completed cards with onClear props */}
           {completed.map(order => (
-            <OrderCard key={order.id} order={order} />
+            <OrderCard
+              key={order.id}
+              order={order}
+              onMove={handleMove}
+              onClear={handleClear}
+            />
           ))}
         </div>
 

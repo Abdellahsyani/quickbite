@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Minus, Plus, Trash2, Star, Flame, Leaf, Search, CheckCircle } from 'lucide-react';
 import api from '../api';
 
 export default function CustomerOrder() {
+  const navigate = useNavigate();
   const [menuItems, setMenuItems] = useState([]);
   const [cart, setCart] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -10,7 +12,9 @@ export default function CustomerOrder() {
 
   const [orderType, setOrderType] = useState('dine_in');
   const [tableNumber, setTableNumber] = useState('');
+
   const [showSuccess, setShowSuccess] = useState(false);
+  const [placedOrderId, setPlacedOrderId] = useState(null);
 
   useEffect(() => {
     api.get('/menu').then(res => {
@@ -64,17 +68,19 @@ export default function CustomerOrder() {
     }));
 
     try {
-      await api.post('/orders', {
+      const response = await api.post('/orders', {
         table: finalTableString,
         items: formattedItems
       });
 
-      setShowSuccess('true');
+      // Save the new order's ID so we can track it
+      setPlacedOrderId(response.data.id);
+
+      // Show popup, clear cart
+      setShowSuccess(true);
       setCart([]);
       setTableNumber('');
-      setTimeout(() => {
-        setShowSuccess(false);
-      }, 3000);
+
     } catch (error) {
       console.error("Checkout failed:", error);
       alert(error.response?.data?.message || "Failed to send order.");
@@ -86,8 +92,6 @@ export default function CustomerOrder() {
 
       {/* LEFT: Premium Menu Browsing */}
       <div className="flex-1 flex flex-col overflow-hidden">
-
-        {/* Header & Filters */}
         <div className="bg-white px-8 py-6 border-b border-gray-200 shrink-0">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Place Order</h1>
 
@@ -120,13 +124,11 @@ export default function CustomerOrder() {
           </div>
         </div>
 
-        {/* Menu Grid */}
         <div className="flex-1 overflow-y-auto p-8">
           {filteredItems.length === 0 ? (
             <div className="text-center py-20 text-gray-500">No items found matching your search.</div>
           ) : (
             <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
-              {/* Using our new dedicated MenuCard component so each card handles its own click state */}
               {filteredItems.map(item => (
                 <MenuCard key={item.id} item={item} onAdd={addToCart} />
               ))}
@@ -213,10 +215,9 @@ export default function CustomerOrder() {
         </div>
       </div>
 
+      {/* SUCCESS POPUP CARD */}
       {showSuccess && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 backdrop-blur-sm">
-
-          {/* THE WHITE POPUP CARD */}
           <div className="bg-white px-10 py-8 rounded-3xl shadow-2xl flex flex-col items-center transform transition-all scale-100 animate-in fade-in zoom-in-95 duration-200">
 
             <div className="flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-5 shadow-inner">
@@ -224,23 +225,39 @@ export default function CustomerOrder() {
             </div>
 
             <h2 className="text-3xl font-bold text-gray-900 text-center mb-2">Order Sent!</h2>
-            <p className="text-gray-500 text-center font-medium">The kitchen is preparing your food.</p>
+            <p className="text-gray-500 text-center font-medium mb-8">The kitchen is preparing your food.</p>
+
+            {/* NEW TRACKING BUTTON */}
+            <button
+              onClick={() => navigate(`/track/${placedOrderId}`)}
+              className="w-full bg-[#2563eb] hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95"
+            >
+              Track Order Progress
+            </button>
+
+            {/* Start New Order Button */}
+            <button
+              onClick={() => setShowSuccess(false)}
+              className="w-full mt-3 text-gray-500 font-medium hover:text-gray-800 transition-colors"
+            >
+              Start New Order
+            </button>
+
           </div>
         </div>
       )}
+
     </div>
   );
 }
 
-// --- NEW COMPONENT: MenuCard ---
-// We create a separate component so each card can track if its description is expanded
+// --- MenuCard Component ---
 function MenuCard({ item, onAdd }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className="bg-white rounded-[14px] border border-gray-200 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] flex flex-col group hover:shadow-md hover:border-blue-300 transition-all h-full">
 
-      {/* 1. FIXED: Removed padding, perfectly covers the entire top box */}
       <div className="relative h-[200px] w-full bg-gray-100 shrink-0 border-b border-gray-100 rounded-t-[14px] overflow-hidden">
         {item.imageUrl ? (
           <img src={`http://localhost:3000${item.imageUrl}`} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -255,14 +272,12 @@ function MenuCard({ item, onAdd }) {
         </div>
       </div>
 
-      {/* Text Content */}
       <div className="p-5 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-2 gap-2">
           <h3 className="text-[17px] font-bold leading-tight text-gray-900">{item.name}</h3>
           <span className="font-mono text-[17px] font-bold whitespace-nowrap text-gray-900">${Number(item.price).toFixed(2)}</span>
         </div>
 
-        {/* 2. FIXED: Clickable description that expands smoothly */}
         <div
           onClick={() => setIsExpanded(!isExpanded)}
           className="mb-4 cursor-pointer group/desc relative"
@@ -277,7 +292,6 @@ function MenuCard({ item, onAdd }) {
           )}
         </div>
 
-        {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-5">
           {item.category === 'Burgers' && (
             <span className="px-2 py-0.5 border text-[10px] rounded-full flex items-center gap-1 font-medium bg-orange-50 text-orange-600 border-orange-200">
@@ -296,7 +310,6 @@ function MenuCard({ item, onAdd }) {
           )}
         </div>
 
-        {/* Pushes the button to the bottom perfectly */}
         <div className="flex-1"></div>
 
         <button
@@ -306,8 +319,6 @@ function MenuCard({ item, onAdd }) {
           <Plus size={18} /> Add to Order
         </button>
       </div>
-
-
     </div>
   );
 }
