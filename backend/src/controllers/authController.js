@@ -4,12 +4,24 @@ import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   try {
-    const { email, name, password, role } = req.body;
+    // Notice we removed 'role' from req.body and added 'token'
+    const { email, name, password, token } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !token) {
+      return res.status(400).json({
+        message: "Please provide name, email, password, and an invite token",
+      });
+    }
+
+    // 1. SECURITY CHECK: Verify the invite token first
+    const invite = await prisma.invite.findUnique({
+      where: { token },
+    });
+
+    if (!invite || invite.isUsed) {
       return res
-        .status(400)
-        .json({ message: "Please provide name, email, password" });
+        .status(403)
+        .json({ message: "Invalid or expired invite link." });
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -19,14 +31,16 @@ export const register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // 2. CREATE USER: Force the role to "admin"
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role: role || "user",
+        role: "admin", // <-- Never trust req.body.role for public registration!
       },
       select: {
         id: true,
@@ -36,14 +50,25 @@ export const register = async (req, res) => {
         createdAt: true,
       },
     });
-    const token = jwt.sign(
+
+    // 3. BURN THE TOKEN: Ensure it can never be used again
+    await prisma.invite.update({
+      where: { token },
+      data: { isUsed: true },
+    });
+
+    // 4. GENERATE PASSPORT: Log them in instantly
+    const jwtToken = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "1d" },
     );
-    return res
-      .status(201)
-      .json({ message: "User registred successfully", token, user });
+
+    return res.status(201).json({
+      message: "Admin registered successfully",
+      token: jwtToken,
+      user,
+    });
   } catch (error) {
     return res
       .status(500)
