@@ -1,71 +1,100 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api';
+import { Lock, Mail, ArrowRight } from 'lucide-react';
+import api from '../api'; // Your axios setup
 
 export default function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
+    // 1. STOPS THE PAGE FROM REFRESHING!
     e.preventDefault();
     setError('');
 
-    const credentials = { email, password };
+    try {
+      // 2. Call actual Express backend
+      const response = await api.post('/auth/login', { email, password });
 
-    // Point this to your Express login route
-    api.post('/auth/login', credentials)
-      .then(response => {
-        // 1. Grab the JWT from the backend
-        const token = response.data.token;
-        // 2. Save it to localStorage
-        localStorage.setItem('token', token);
-        // 3. Teleport the user to the Live Orders dashboard
-        navigate('/');
-      })
-      .catch(err => {
-        setError(err.response?.data?.message || "Invalid email or password");
-      });
+      // 3. Save the token and role EXACTLY as ProtectedRoute expects them
+      const { token, user } = response.data;
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', user.role); // Make sure your backend sends the role here!
+
+      // 4. Send them to the correct page based on their job title
+      if (user.role === 'admin') {
+        navigate('/AdminDashboard');
+      } else {
+        navigate('/'); // The Kitchen board
+      }
+
+    } catch (err) {
+      console.error("Login failed:", err);
+      // Show the error message from the backend, or a generic one
+      setError(err.response?.data?.message || 'Invalid email or password.');
+    }
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">QuickBite KDS Login</h2>
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
 
-        {error && <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg">{error}</div>}
+        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+          <Lock size={32} className="text-blue-600" />
+        </div>
 
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <h2 className="text-3xl font-bold text-slate-900 mb-2">Staff Portal</h2>
+        <p className="text-slate-500 font-medium mb-8">Sign in to access your dashboard.</p>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-bold border border-red-100">
+            {error}
+          </div>
+        )}
+
+        {/* The onSubmit MUST point to handleLogin */}
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <label className="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium text-slate-900"
+                placeholder="admin@restaurant.com"
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <label className="block text-sm font-bold text-slate-700 mb-2">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium text-slate-900"
+                placeholder="••••••••"
+              />
+            </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 mt-2 transition-colors"
+            className="w-full bg-[#2563eb] hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 mt-2"
           >
-            Sign In
+            Sign In <ArrowRight size={18} />
           </button>
         </form>
+
       </div>
     </div>
   );

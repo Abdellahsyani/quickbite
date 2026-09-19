@@ -7,7 +7,6 @@ import Menu from './pages/Menu';
 import ProtectedRoute from './components/ProtectedRoute';
 import CustomerOrder from './pages/CustomerOrder';
 import AdminDashboard from './pages/AdminDashboard';
-import OrderTracker from './pages/OrderTracker'; // <-- Added this import
 
 export default function App() {
   return (
@@ -18,13 +17,12 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/order" element={<CustomerOrder />} />
-        <Route path="/track/:id" element={<OrderTracker />} />
 
         {/* --- 2. STAFF LAYOUT (The shared sidebar/header) --- */}
         <Route path="/" element={<Layout />}>
 
           {/* KITCHEN STAFF & ADMIN: Both can see the Kanban Board */}
-          <Route element={<ProtectedRoute allowedRoles={['admin', 'member']} />}>
+          <Route element={<ProtectedRoute allowedRoles={['admin', 'stuff']} />}>
             <Route index element={<LiveOrders />} />
           </Route>
 
