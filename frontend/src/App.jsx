@@ -7,24 +7,31 @@ import Menu from './pages/Menu';
 import ProtectedRoute from './components/ProtectedRoute';
 import CustomerOrder from './pages/CustomerOrder';
 import AdminDashboard from './pages/AdminDashboard';
+import OrderTracker from './pages/OrderTracker'; // <-- Added this import
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* PUBLIC ROUTES (Anyone can access these) */}
-        <Route path="/register" element={<Register />} />
+        {/* --- 1. PUBLIC ROUTES (Anyone can access these) --- */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/order" element={<CustomerOrder />} />
+        <Route path="/track/:id" element={<OrderTracker />} />
 
-        {/* PROTECTED ROUTES (Must have a token to enter) */}
-        <Route element={<ProtectedRoute />}> {/* <-- 2. Wrap the Layout */}
+        {/* --- 2. STAFF LAYOUT (The shared sidebar/header) --- */}
+        <Route path="/" element={<Layout />}>
 
-          <Route path="/" element={<Layout />}>
+          {/* KITCHEN STAFF & ADMIN: Both can see the Kanban Board */}
+          <Route element={<ProtectedRoute allowedRoles={['admin', 'member']} />}>
             <Route index element={<LiveOrders />} />
+          </Route>
+
+          {/* ADMIN ONLY: Only the owner can see the Dashboard and Edit the Menu */}
+          <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
             <Route path="menu" element={<Menu />} />
-            <Route path="/order" element={<CustomerOrder />} />
-            <Route path="/AdminDashboard" element={<AdminDashboard />} />
+            <Route path="AdminDashboard" element={<AdminDashboard />} />
           </Route>
 
         </Route>
