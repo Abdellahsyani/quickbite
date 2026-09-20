@@ -2,6 +2,67 @@ import bcrypt from "bcryptjs";
 import { prisma } from "../config/db.js";
 import jwt from "jsonwebtoken";
 
+export const createStaff = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Please provide name, email, and password." });
+    }
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "An account with this email already exists." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Force the role to "member" regardless of what the frontend sends
+    const staff = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: "stuff",
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    return res
+      .status(201)
+      .json({ message: "Chef account created successfully!", staff });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+// Optional: A function to get the list of current staff
+export const getStaff = async (req, res) => {
+  try {
+    const staff = await prisma.user.findMany({
+      where: { role: "stuff" },
+      select: { id: true, name: true, email: true, createdAt: true },
+    });
+    return res.status(200).json(staff);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
 export const register = async (req, res) => {
   try {
     // Notice we removed 'role' from req.body and added 'token'
