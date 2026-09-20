@@ -7,6 +7,7 @@ import Menu from './pages/Menu';
 import ProtectedRoute from './components/ProtectedRoute';
 import CustomerOrder from './pages/CustomerOrder';
 import AdminDashboard from './pages/AdminDashboard';
+import StaffManagement from './pages/stuffManagement';
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
             <Route path="menu" element={<Menu />} />
             <Route path="AdminDashboard" element={<AdminDashboard />} />
+            <Route path="staff" element={<StaffManagement />} />
           </Route>
 
         </Route>
