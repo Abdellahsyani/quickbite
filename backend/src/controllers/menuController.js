@@ -31,7 +31,11 @@ export const createMenuItem = async (req, res) => {
 
 export const getMenuItems = async (req, res) => {
   try {
-    const MenuItem = await prisma.menuItem.findMany();
+    const MenuItem = await prisma.menuItem.findMany({
+      where: {
+        isDeleted: false,
+      },
+    });
     return res.status(200).json(MenuItem);
   } catch (error) {
     return res
@@ -109,6 +113,7 @@ export const deleteMenuItem = async (req, res) => {
       where: {
         id: itemId,
       },
+      data: { isDeleted: true },
     });
     return res
       .status(200)
