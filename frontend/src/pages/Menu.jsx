@@ -5,6 +5,7 @@ import api from '../api';
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deleteCrad, setDeleteCard] = useState(false);
 
   // Filter States
   const [activeCategory, setActiveCategory] = useState('All');
@@ -92,6 +93,15 @@ export default function Menu() {
   const totalItems = menuItems.length;
   const availItems = menuItems.filter(i => i.isAvailable !== false).length;
   const unavailItems = totalItems - availItems;
+
+  const deletedCard = async (id) => {
+    try {
+      await api.delete(`/menu/${id}`);
+      setMenuItems(menuItems.filter(item => item.id !== id));
+    } catch (error) {
+      console.log("Failed to delete card", error);
+    };
+  }
 
   if (loading) {
     return <div className="p-8 text-gray-500">Loading catalog...</div>;
@@ -212,7 +222,7 @@ export default function Menu() {
                         <button className="p-1.5 bg-white/95 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg shadow-sm border border-gray-100 transition-colors">
                           <Edit size={16} />
                         </button>
-                        <button className="p-1.5 bg-white/95 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg shadow-sm border border-gray-100 transition-colors">
+                        <button onClick={() => deletedCard(item.id)} className="p-1.5 bg-white/95 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg shadow-sm border border-gray-100 transition-colors">
                           <Trash2 size={16} />
                         </button>
                       </div>
