@@ -5,12 +5,12 @@ import api from '../api';
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [deleteCrad, setDeleteCard] = useState(false);
 
   // Filter States
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [showUnavailable, setShowUnavailable] = useState(true);
+  const [editingItemId, setEditingItemId] = useState('');
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -99,9 +99,47 @@ export default function Menu() {
       await api.delete(`/menu/${id}`);
       setMenuItems(menuItems.filter(item => item.id !== id));
     } catch (error) {
-      console.log("Failed to delete card", error);
+      console.error("Failed to delete card", error);
     };
   }
+
+  const EditCard = (item) => {
+    setEditingItemId(item.id);
+    setFormData({
+      name: item.name,
+      description: item.description || '',
+      price: item.price,
+      category: item.category,
+    });
+    if (item.imageUrl) {
+      setImagePreview(`http://localhost:3000${item.imageUrl}`);
+    } else {
+      setImagePreview(null);
+    }
+    setIsModalOpen(true);
+  }
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    const submitData = new FormData();
+    submitData.append('name', formData.name);
+    submitData.append('description', formData.description);
+    submitData.append('price', formData.price);
+    submitData.append('category', formData.category);
+    if (imageFile) submitData.append('image', imageFile);
+
+    try {
+      await api.patch(`/menu/${editingItemId}`, submitData);
+      setIsModalOpen(false);
+      setFormData({ name: '', description: '', price: '', category: 'Burgers' });
+      setImageFile(null);
+      setImagePreview(null);
+      fetchMenu();
+    } catch (error) {
+      console.error("Failed to create item:", error);
+      alert(error.response?.data?.message || "Failed to create item");
+    }
+  };
 
   if (loading) {
     return <div className="p-8 text-gray-500">Loading catalog...</div>;
@@ -219,7 +257,7 @@ export default function Menu() {
                       </div>
 
                       <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                        <button className="p-1.5 bg-white/95 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg shadow-sm border border-gray-100 transition-colors">
+                        <button onClick={() => EditCard(item)} className="p-1.5 bg-white/95 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg shadow-sm border border-gray-100 transition-colors">
                           <Edit size={16} />
                         </button>
                         <button onClick={() => deletedCard(item.id)} className="p-1.5 bg-white/95 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg shadow-sm border border-gray-100 transition-colors">
@@ -299,13 +337,13 @@ export default function Menu() {
         <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Add New Item</h2>
+              <h2 className="text-xl font-bold text-gray-900"> {editingItemId ? "Edit Item" : "Add New Item"}</h2>
               <button onClick={() => { setIsModalOpen(false); setImagePreview(null); setImageFile(null); }} className="text-gray-400 hover:text-gray-700 transition-colors">
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form onSubmit={editingItemId ? handleSubmit : handleSaveEdit} className="flex flex-col gap-4">
               <div className="mb-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Item Image</label>
                 <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl relative overflow-hidden group hover:border-blue-500 hover:bg-blue-50/50 transition-colors">
@@ -358,7 +396,7 @@ export default function Menu() {
                   Cancel
                 </button>
                 <button type="submit" className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                  Save Item
+                  {editingItemId ? "Save Changes" : "Add Item"}
                 </button>
               </div>
             </form>
