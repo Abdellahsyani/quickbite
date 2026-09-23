@@ -98,6 +98,7 @@ export default function Menu() {
     try {
       await api.delete(`/menu/${id}`);
       setMenuItems(menuItems.filter(item => item.id !== id));
+      fetchMenu();
     } catch (error) {
       console.error("Failed to delete card", error);
     };
