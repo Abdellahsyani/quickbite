@@ -338,7 +338,15 @@ export default function Menu() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-gray-900"> {editingItemId ? "Edit Item" : "Add New Item"}</h2>
-              <button onClick={() => { setIsModalOpen(false); setImagePreview(null); setImageFile(null); }} className="text-gray-400 hover:text-gray-700 transition-colors">
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setImagePreview(null);
+                  setImageFile(null);
+                  setEditingItemId(null);
+                }}
+                className="text-gray-400 hover:text-gray-700 transition-colors"
+              >
                 <X size={20} />
               </button>
             </div>
@@ -392,7 +400,16 @@ export default function Menu() {
               </div>
 
               <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
-                <button type="button" onClick={() => { setIsModalOpen(false); setImagePreview(null); setImageFile(null); }} className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setImagePreview(null);
+                    setImageFile(null);
+                    setEditingItemId(null); // <-- Added this
+                  }}
+                  className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
                   Cancel
                 </button>
                 <button type="submit" className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
