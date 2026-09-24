@@ -109,7 +109,7 @@ export const deleteMenuItem = async (req, res) => {
     if (isNaN(itemId)) {
       return res.status(400).json({ message: "Invalid Item ID" });
     }
-    const deletedItem = await prisma.menuItem.delete({
+    const deletedItem = await prisma.menuItem.update({
       where: {
         id: itemId,
       },
