@@ -161,3 +161,28 @@ export const updateOrderStatus = async (req, res) => {
       .json({ message: "Server error", error: error.message });
   }
 };
+
+export const clearOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const itemid = parseInt(id, 10);
+
+    if (isNaN(itemid)) {
+      return res.status(400).json({ message: "Invalid Order ID" });
+    }
+    const clearedItem = await prisma.order.update({
+      where: { id: itemid },
+      data: { status: "ARCHIVED" },
+    });
+    return res
+      .status(201)
+      .json({ message: "Item delteted successfully", itemid: clearedItem });
+  } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "order Not found" });
+    }
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};

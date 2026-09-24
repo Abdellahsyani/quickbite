@@ -4,6 +4,7 @@ import {
   getMyOrder,
   getAllOrders,
   updateOrderStatus,
+  clearOrder,
 } from "../controllers/orderController.js";
 import { authorizeRole } from "../middlewares/authorizeRole.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
@@ -16,5 +17,6 @@ router.get("/mine", getMyOrder);
 
 router.get("/", authorizeRole("admin", "stuff"), getAllOrders);
 router.patch("/:id/status", authorizeRole("admin", "stuff"), updateOrderStatus);
+router.delete("/:id", authorizeRole("admin", "stuff"), clearOrder);
 
 export default router;

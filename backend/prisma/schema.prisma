@@ -14,6 +14,7 @@ enum OrderStatus {
   PREPARING
   COMPLETED
   CANCELLED
+  ARCHIVED
 }
 
 model User {
