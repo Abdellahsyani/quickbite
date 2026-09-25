@@ -4,7 +4,7 @@ import api from '../api';
 
 export default function StaffManagement() {
   const [staff, setStaff] = useState([]);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', position: '', password: '' });
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,7 +35,7 @@ export default function StaffManagement() {
       await api.post('/users/staff', formData);
 
       setMessage({ type: 'success', text: `Account for ${formData.name} created successfully!` });
-      setFormData({ name: '', email: '', password: '' }); // Clear the form
+      setFormData({ name: '', email: '', position: '', password: '' }); // Clear the form
       fetchStaff(); // Refresh the table
 
     } catch (error) {
@@ -122,6 +122,21 @@ export default function StaffManagement() {
               </div>
             </div>
 
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Job Type</label>
+              <div className="relative">
+                <ChefHat className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type="text"
+                  required
+                  value={formData.position}
+                  onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] transition-all font-medium text-slate-900"
+                  placeholder="chef"
+                />
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={isLoading}
@@ -147,7 +162,7 @@ export default function StaffManagement() {
                 <tr className="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider">
                   <th className="p-4 font-bold">Name</th>
                   <th className="p-4 font-bold">Email</th>
-                  <th className="p-4 font-bold">Role</th>
+                  <th className="p-4 font-bold">Job tittle</th>
                   <th className="p-4 font-bold text-right">Added On</th>
                 </tr>
               </thead>
@@ -163,11 +178,7 @@ export default function StaffManagement() {
                     <tr key={member.id} className="hover:bg-slate-50 transition-colors">
                       <td className="p-4 font-bold text-slate-900">{member.name}</td>
                       <td className="p-4 text-slate-500">{member.email}</td>
-                      <td className="p-4">
-                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 uppercase">
-                          {member.role}
-                        </span>
-                      </td>
+                      <td className="p-4 text-blue-700">{member.position}</td>
                       <td className="p-4 text-slate-500 text-sm text-right">
                         {new Date(member.createdAt).toLocaleDateString()}
                       </td>

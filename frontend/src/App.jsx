@@ -23,7 +23,7 @@ export default function App() {
         <Route path="/" element={<Layout />}>
 
           {/* KITCHEN STAFF & ADMIN: Both can see the Kanban Board */}
-          <Route element={<ProtectedRoute allowedRoles={['admin', 'stuff']} />}>
+          <Route element={<ProtectedRoute allowedRoles={['admin', 'staff']} />}>
             <Route index element={<LiveOrders />} />
           </Route>
 
