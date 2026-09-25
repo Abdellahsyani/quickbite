@@ -22,7 +22,7 @@ export default function AdminDashboard() {
 
   // --- ANALYTICS CALCULATIONS ---
   // 1. Basic Metrics
-  const completedOrders = orders.filter(o => o.status === 'COMPLETED');
+  const completedOrders = orders.filter(o => o.status === 'COMPLETED' || o.status === 'ARCHIVED');
   const pendingOrders = orders.filter(o => o.status === 'PENDING' || o.status === 'PREPARING');
 
   const totalRevenue = completedOrders.reduce((sum, order) => sum + Number(order.totalPrice || 0), 0);
