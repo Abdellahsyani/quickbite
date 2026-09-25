@@ -15,8 +15,8 @@ router.use(authenticateToken);
 router.post("/", createOrder);
 router.get("/mine", getMyOrder);
 
-router.get("/", authorizeRole("admin", "stuff"), getAllOrders);
-router.patch("/:id/status", authorizeRole("admin", "stuff"), updateOrderStatus);
-router.delete("/:id", authorizeRole("admin", "stuff"), clearOrder);
+router.get("/", authorizeRole("admin", "staff"), getAllOrders);
+router.patch("/:id/status", authorizeRole("admin", "staff"), updateOrderStatus);
+router.delete("/:id", authorizeRole("admin", "staff"), clearOrder);
 
 export default router;

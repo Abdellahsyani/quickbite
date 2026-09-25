@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 
 export const createStaff = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, position } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !position) {
       return res
         .status(400)
         .json({ message: "Please provide name, email, and password." });
@@ -27,12 +27,14 @@ export const createStaff = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role: "stuff",
+        position,
+        role: "staff",
       },
       select: {
         id: true,
         name: true,
         email: true,
+        position: true,
         role: true,
         createdAt: true,
       },
@@ -52,8 +54,14 @@ export const createStaff = async (req, res) => {
 export const getStaff = async (req, res) => {
   try {
     const staff = await prisma.user.findMany({
-      where: { role: "stuff" },
-      select: { id: true, name: true, email: true, createdAt: true },
+      where: { role: "staff" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        position: true,
+        createdAt: true,
+      },
     });
     return res.status(200).json(staff);
   } catch (error) {
