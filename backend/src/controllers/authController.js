@@ -27,7 +27,7 @@ export const createStaff = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        position,
+        position: "owner",
         role: "staff",
       },
       select: {
@@ -158,6 +158,11 @@ export const login = async (req, res) => {
     });
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
+    }
+    if (user && user.isActive === false) {
+      return res
+        .status(400)
+        .json({ message: "This account has been deactivated" });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
