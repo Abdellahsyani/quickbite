@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UserPlus, Mail, Lock, User, ChefHat } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, ChefHat, Trash2 } from 'lucide-react';
 import api from '../api';
 
 export default function StaffManagement() {
@@ -45,6 +45,19 @@ export default function StaffManagement() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRemoveStaff = async (id, name) => {
+    const isConfirmed = window.confirm(`Are you sure you want to remove ${name} from the active staff`);
+    if (!isConfirmed) return;
+    try {
+      await api.patch(`/users/staff/${id}/deactivate`);
+      setMessage({ type: 'success', text: `${name} has been removed from the system` });
+      fetchStaff();
+    } catch (error) {
+      console.log("Failed to remove the staff:", error);
+      setMessage({ type: "error", text: "Failed to remove staff member" });
     }
   };
 
@@ -164,6 +177,7 @@ export default function StaffManagement() {
                   <th className="p-4 font-bold">Email</th>
                   <th className="p-4 font-bold">Job tittle</th>
                   <th className="p-4 font-bold text-right">Added On</th>
+                  <th className="p-4 font-bold text-center">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -181,6 +195,14 @@ export default function StaffManagement() {
                       <td className="p-4 text-blue-700">{member.position}</td>
                       <td className="p-4 text-slate-500 text-sm text-right">
                         {new Date(member.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className='p-4 text-center'>
+                        <button onClick={() => handleRemoveStaff(member.id, member.name)}
+                          className='text-slate-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors'
+                          tittle="Remove Staff Member"
+                        >
+                          <Trash2 size={20} />
+                        </button>
                       </td>
                     </tr>
                   ))
