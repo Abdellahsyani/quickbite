@@ -32,15 +32,12 @@ export const deactivateStaff = async (req, res) => {
 
     const updateUser = await prisma.user.update({
       where: { id: staffId },
-      data: { isActivate: false },
+      data: { isActive: false },
     });
-    return (
-      res,
-      status(200).json({
-        message: "Staff member deactivate successfully",
-        user: updateUser,
-      })
-    );
+    return res.status(200).json({
+      message: "Staff member deactivate successfully",
+      user: updateUser,
+    });
   } catch (error) {
     if (error.code === "P2025") {
       return res.status(404).json({ message: "Staff member not found" });

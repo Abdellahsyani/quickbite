@@ -36,6 +36,7 @@ export const createStaff = async (req, res) => {
         email: true,
         position: true,
         role: true,
+        isActive: true,
         createdAt: true,
       },
     });
@@ -54,12 +55,13 @@ export const createStaff = async (req, res) => {
 export const getStaff = async (req, res) => {
   try {
     const staff = await prisma.user.findMany({
-      where: { role: "staff" },
+      where: { role: "staff", isActive: true },
       select: {
         id: true,
         name: true,
         email: true,
         position: true,
+        isActive: true,
         createdAt: true,
       },
     });
