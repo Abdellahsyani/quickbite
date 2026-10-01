@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 // Deleted 'const prisma = new PrismaClient()' because you already imported it on line 1!
 
 async function main() {
+  console.log("🌱 Seeding database...");
   console.log("Bypassing API and injecting admin...");
 
   const hashedPassword = await bcrypt.hash("admin123", 10);

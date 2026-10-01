@@ -27,7 +27,7 @@ export const createStaff = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        position: "owner",
+        position,
         role: "staff",
       },
       select: {
