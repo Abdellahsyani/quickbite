@@ -1,141 +1,160 @@
-# QuickBite API 🍔
-
-A robust, production-ready RESTful API for restaurant order and catalog management built with Node.js, Express, Prisma ORM, and PostgreSQL.
-
----
-
-## Features
-
-- **Authentication & Security:** JWT-based stateless authentication with password hashing via `bcryptjs` and custom Role-Based Access Control (RBAC).
-- **Menu Management:** Full CRUD operations for menu items with dynamic category and availability tracking.
-- **Order Processing:** Multi-item cart checkout with server-side price validation, stock availability verification, and real-time order status transitions.
-- **Data Integrity:** Relational schema modeling with Prisma and PostgreSQL, backed by persistent Docker storage.
-- **Role Isolation:** Granular authorization layers dividing administrative functions (`admin`) from user workflows (`customer`).
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-| :--- | :--- |
-| **Runtime** | Node.js (ES Modules) |
-| **Framework** | Express.js |
-| **Database** | PostgreSQL |
-| **ORM** | Prisma ORM |
-| **Security** | JSON Web Tokens (JWT), Bcrypt.js |
-| **DevOps & Tools** | Docker, Docker Compose, Nodemon |
-
----
-
-## Project Structure
-
-```text
+# 🍔 QuickBite POS  
+  
+A full-stack, invite-only restaurant management platform built for modern food service operations. QuickBite connects customers, kitchen staff, and administrators through a unified, real-time system.  
+  
+---  
+  
+## 🧠 What is QuickBite?  
+  
+QuickBite is a Point-of-Sale (POS) and Kitchen Display System (KDS) designed for restaurants. It covers the full order lifecycle — from a customer browsing the menu and placing an order, to kitchen staff preparing it, to the admin reviewing analytics.  
+  
+---  
+  
+## 🏗️ Architecture Overview
+```bash
 quickbite/
-├── prisma/
-│   ├── migrations/          # Chronological database migrations
-│   └── schema.prisma        # Database models, relations & enums
-├── src/
-│   ├── config/
-│   │   └── db.js            # Prisma client instance & DB lifecycle
-│   ├── controllers/         # Request handling & HTTP response logic
-│   ├── middlewares/         # JWT verification & RBAC guards
-│   ├── routes/              # Express REST routing pipelines
-│   └── app.js               # Application entry point & middleware mounting
-├── docker-compose.yml       # Local PostgreSQL service definition
-├── .env.example             # Template for required environment variables
-└── package.json
+├── backend/ # Node.js + Express REST API
+│ ├── src/
+│ │ ├── controllers/ # Business logic (orders, auth, menu, users)
+│ │ ├── routes/ # API route definitions
+│ │ ├── middlewares/ # JWT auth & role authorization
+│ │ └── config/ # DB connection (Prisma + PostgreSQL)
+│ └── prisma/
+│ └── schema.prisma # Database models
+└── frontend/ # React 19 SPA (Vite + Tailwind CSS)
+└── src/
+├── pages/ # Full page views
+├── components/ # Reusable UI components
+└── api.js # Centralized Axios client
 ```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v18 or newer recommended)
-- [Docker](https://www.docker.com/) & Docker Compose
-- `npm` or `yarn`
-
-### 1. Clone & Install Dependencies
-
+---  
+  
+## 👥 User Roles  
+  
+QuickBite has three distinct roles:  
+  
+| Role | Access |  
+|---|---|  
+| **Public Customer** | Browse menu, place orders at `/order` (no login required) |  
+| **Staff (Kitchen)** | View & manage the live KDS Kanban board (`/`) |  
+| **Admin (Owner)** | Full access: Dashboard, Menu Management, Staff Management |  
+  
+> Admin accounts are **invite-only**. Registration requires a valid invite token.  
+  
+---  
+  
+## ✨ Features  
+  
+### 🛒 Customer Ordering (`/order`)  
+- Browse menu items filtered by category (Burgers, Sides, Drinks, Salads, Wraps, Desserts) or search term  
+- Add items to a cart, adjust quantities, remove items  
+- Choose **Dine In** (with table number) or **Takeout**  
+- Submit order directly to the kitchen  
+- Track order progress after placement  
+  
+### 🍳 Kitchen Display System — KDS (`/`)  
+- Real-time Kanban board with **5-second auto-polling**  
+- Three columns: `PENDING` → `PREPARING` → `COMPLETED`  
+- **Optimistic UI updates**: cards move instantly on click, reverting if the server fails  
+- Elapsed time timer per order; orders older than 10 minutes are flagged as late  
+- Clear completed orders (soft-archived, retained for analytics)  
+  
+### 📊 Admin Dashboard (`/AdminDashboard`)  
+- Total Revenue, Completed Orders, Average Order Value (AOV), Active Kitchen load  
+- Recent transactions table  
+- Top 5 selling menu items by quantity  
+  
+### 🍽️ Menu Management (`/menu`)  
+- Add, edit, and soft-delete menu items  
+- Toggle item availability  
+- Upload item images (multipart/form-data)  
+- Filter by category and search  
+  
+### 👨‍🍳 Staff Management (`/staff`)  
+- View all kitchen staff accounts  
+- Create new chef accounts with temporary passwords  
+- Deactivate staff accounts (soft delete via `isActive` flag)  
+  
+---  
+  
+## 🔄 Order Lifecycle
 ```bash
-git clone [https://github.com/](https://github.com/)<your-username>/quickbite.git
+Customer Places Order (POST /api/orders)
+↓
+Status: PENDING ──→ PREPARING ──→ COMPLETED
+↓ ↓
+Kitchen KDS Board Staff clears → ARCHIVED
+(retained for analytics)
+```
+---  
+  
+## 🛠️ Tech Stack  
+  
+### Backend  
+- **Node.js** + **Express 5**  
+- **PostgreSQL** (via **Prisma ORM**)  
+- **JWT** authentication (`jsonwebtoken`)  
+- **bcrypt** for password hashing  
+- **Multer** for image uploads  
+  
+### Frontend  
+- **React 19** + **Vite**  
+- **Tailwind CSS 4**  
+- **React Router DOM 7**  
+- **Axios** (centralized API client)  
+- **Lucide React** icons  
+  
+---  
+  
+## 🚀 Getting Started  
+  
+### Prerequisites  
+- [Docker](https://www.docker.com/) & Docker Compose  
+  
+### 1. Clone the repository  
+```bash  
+git clone https://github.com/Abdellahsyani/quickbite.git  
 cd quickbite
-npm install
 ```
 
-### 2. Configure Environment Variables
+### 2. Configure environment variables
+- Create a .env file in the project root:
+    ```bash
+    DB_USER=postgres  
+    DB_PASSWD=yourpassword  
+    DB_NAME=quickbite  
+    DB_PORT=5432  
+    PORT=3000  
+    NODE_ENV=development  
+    JWT_SECRET=your_super_secret_key  
+    JWT_EXPIRES_IN=1d
+    ```
 
-Create a `.env` file in the project root:
-
-```env
-PORT=3000
-DATABASE_URL="postgresql://postgres:password@localhost:5432/quickbite?schema=public"
-JWT_SECRET="your_secure_random_jwt_secret_key"
-JWT_EXPIRES_IN="1d"
-NODE_ENV="development"
-```
-
-### 3. Spin Up the Database
-
-Start the PostgreSQL database container via Docker:
-
+### 3. Start all services
 ```bash
-docker compose up -d
+docker compose up --build
 ```
-
-### 4. Run Migrations & Generate Prisma Client
-
-Apply all schema migrations to your local database:
-
+- This starts three services:
 ```bash
-npx prisma migrate dev
+    quickbite_db — PostgreSQL 17 database
+    quickbite_api — Express backend on http://localhost:3000
+    quickbite_web — React frontend on http://localhost:5173 
 ```
+- The API container automatically runs prisma migrate deploy on startup.
 
-### 5. Start the Development Server
+## 🔑 API Endpoints
 
-```bash
-npm run dev
-```
-
-The API will be available at `http://localhost:3000`.
-
----
-
-## API Reference
-
-### Authentication & Profile
-
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Public | Register a new customer or admin account |
-| `POST` | `/api/auth/login` | Public | Authenticate user credentials and receive a JWT |
-| `GET` | `/api/profile` | Authenticated | Fetch current authenticated user's profile |
-| `PUT` | `/api/profile` | Authenticated | Update current user's profile details |
-
-### Menu Management
-
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/menu` | Public | Retrieve catalog of all menu items |
-| `GET` | `/api/menu/:id` | Public | Retrieve detailed information for a single item |
-| `POST` | `/api/menu` | Admin | Add a new menu item |
-| `PUT` | `/api/menu/:id` | Admin | Fully replace a menu item record |
-| `PATCH` | `/api/menu/:id` | Admin | Partially update item fields (price, availability) |
-| `DELETE` | `/api/menu/:id` | Admin | Remove an item from the menu catalog |
-
-### Order Operations
-
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/orders` | Customer | Place an order with multiple menu items and quantities |
-| `GET` | `/api/orders/mine` | Customer | List order history for the logged-in user |
-| `GET` | `/api/orders/:id` | Authenticated | View a specific receipt (scoped to owner or Admin) |
-| `GET` | `/api/orders` | Admin | Retrieve all restaurant orders across the platform |
-| `PATCH` | `/api/orders/:id/status`| Admin | Advance status (`PENDING` $\rightarrow$ `PREPARING` $\rightarrow$ `COMPLETED` / `CANCELLED`) |
-
----
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/auth/login` | Public | Login |
+| `POST` | `/api/auth/register` | Invite token | Register admin |
+| `GET` | `/api/menu` | Public | Get menu items |
+| `POST` | `/api/menu` | Admin | Add menu item |
+| `PATCH` | `/api/menu/:id` | Admin | Edit menu item |
+| `POST` | `/api/orders` | Auth | Place an order |
+| `GET` | `/api/orders` | Admin/Staff | Get all orders |
+| `PATCH` | `/api/orders/:id/status` | Admin/Staff | Update order status |
+| `DELETE` | `/api/orders/:id` | Admin/Staff | Archive order |
+| `GET` | `/api/users/staff` | Admin | List staff |
+| `POST` | `/api/users/staff` | Admin | Create staff account |
+| `PATCH` | `/api/users/staff/:id/deactivate` | Admin | Deactivate staff |
