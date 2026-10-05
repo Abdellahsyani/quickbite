@@ -1,5 +1,7 @@
 import express from "express";
 import { config } from "dotenv";
+import http from "http";
+import { Server } from "socket.io";
 import cors from "cors";
 import { connectDB, disconnectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -11,6 +13,23 @@ config();
 connectDB();
 
 const app = express();
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(`🟢 New KDS connected! Socket ID: ${socket.id}`);
+
+  socket.on("disconnect", () => {
+    console.log(`🟢 New KDS connected! Socket ID: ${socket.id}`);
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.use(
@@ -30,7 +49,7 @@ app.use("/api/menu", menuRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is listening on http://localhost:${PORT}`);
 });
 
