@@ -1,0 +1,58 @@
+name: QuickBite CI 
+
+on:
+  push:
+    branches: ["main"]
+    pull_request:
+      branches: ["main"]
+
+jobs:
+  test-docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Inject dummy environment variables for the test
+      - name: Create Test .env Files
+        run: |
+          # Create the Root .env for Compose
+          echo "DB_USER=postgres" >> .env
+          echo "DB_PASSWD=testpassword" >> .env
+          echo "DB_NAME=quickbite_test" >> .env
+          echo "NODE_ENV=development" >> .env
+          
+          # Create the Backend .env for Prisma
+          echo "DATABASE_URL=postgresql://postgres:testpassword@db:5432/quickbite_test?schema=public" >> backend/.env
+          echo "JWT_SECRET=github_actions_secret" >> backend/.env
+
+      # 3. Build and spin up the exact architecture we just perfected
+      - name: Build and Start Containers
+        run: docker compose up -d --build
+
+      # 4. Wait for PostgreSQL and Nodemon to boot
+      - name: Wait for Services
+        run: sleep 15
+
+      # 5. The Crash Test: Did the API container survive?
+      - name: Verify API is Running
+        run: |
+          # Print the status of all containers for the GitHub logs
+          docker compose ps
+          
+          # Check if the API container is actually running
+          API_STATUS=$(docker inspect -f '{{.State.Running}}' quickbite_api)
+          
+          if [ "$API_STATUS" != "true" ]; then
+            echo "❌ The API container crashed! Fetching logs..."
+            docker compose logs api
+            exit 1
+          fi
+          echo "✅ API is running perfectly!"
+
+      # 6. Clean up the runner
+      - name: Tear Down
+        if: always()
+        run: docker compose down -v
+
