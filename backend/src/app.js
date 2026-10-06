@@ -22,11 +22,13 @@ const io = new Server(server, {
   },
 });
 
+app.set("io", io);
+
 io.on("connection", (socket) => {
   console.log(`🟢 New KDS connected! Socket ID: ${socket.id}`);
 
   socket.on("disconnect", () => {
-    console.log(`🟢 New KDS connected! Socket ID: ${socket.id}`);
+    console.log(`🔴 KDS disconnected! Socket ID: ${socket.id}`);
   });
 });
 
