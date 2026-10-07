@@ -2,6 +2,7 @@ import { Pause } from 'lucide-react';
 import Card from '../components/Card';
 import OrderCard from '../components/OrderCard';
 import { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 import api from '../api';
 
 export default function LiveOrders() {
@@ -21,8 +22,23 @@ export default function LiveOrders() {
   // 2. Added the 5-second live-polling loop
   useEffect(() => {
     fetchOrders();
-    const intervalId = setInterval(fetchOrders, 5000);
-    return () => clearInterval(intervalId);
+
+    const socket = io('http://localhost:3000');
+
+    socket.on("new_order", (newOrder) => {
+      console.log("INCOMING TICKET:", newOrder);
+      setOrders(prevOrders => [...prevOrders, newOrder]);
+    })
+
+    socket.on("order_updated", (updatedOrder) => {
+      setOrders(prevOrders =>
+        prevOrders.map(order => order.id === updatedOrder.id ? updatedOrder : order)
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   // 3. The function that physically moves the cards instantly
