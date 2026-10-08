@@ -149,6 +149,8 @@ export const updateOrderStatus = async (req, res) => {
         status,
       },
     });
+    const io = req.app.get("io");
+    io.emit("order_updated", updateOrder);
     return res
       .status(200)
       .json({ message: "Status Updated successfully", order: updateOrder });
