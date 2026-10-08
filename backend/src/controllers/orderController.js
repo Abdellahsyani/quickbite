@@ -2,7 +2,7 @@ import { prisma, OrderStatus } from "../config/db.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user ? req.user.id : null;
     const { items, table } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -67,6 +67,8 @@ export const createOrder = async (req, res) => {
         items: true,
       },
     });
+    const io = req.app.get("io");
+    if (io) io.emit("new_order", newOrder);
 
     return res
       .status(201)

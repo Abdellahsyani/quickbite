@@ -52,8 +52,8 @@ model MenuItem {
 
 model Order {
   id         Int         @id @default(autoincrement())
-  userId     Int         @map("user_id")
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int?         @map("user_id")
+  user       User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
   status     OrderStatus @default(PENDING)
   
   table      String      @default("Takeout") // ADD THIS BACK!

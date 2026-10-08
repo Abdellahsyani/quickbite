@@ -10,10 +10,11 @@ import { authorizeRole } from "../middlewares/authorizeRole.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 
 const router = Router();
-router.use(authenticateToken);
 
 router.post("/", createOrder);
 router.get("/mine", getMyOrder);
+
+router.use(authenticateToken);
 
 router.get("/", authorizeRole("admin", "staff"), getAllOrders);
 router.patch("/:id/status", authorizeRole("admin", "staff"), updateOrderStatus);
