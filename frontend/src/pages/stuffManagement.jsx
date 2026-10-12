@@ -139,14 +139,30 @@ export default function StaffManagement() {
               <label className="block text-sm font-bold text-slate-700 mb-2">Job Type</label>
               <div className="relative">
                 <ChefHat className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input
-                  type="text"
+
+                <select
                   required
                   value={formData.position}
                   onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] transition-all font-medium text-slate-900"
-                  placeholder="chef"
-                />
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] transition-all font-medium text-slate-900 cursor-pointer appearance-none"
+                >
+                  {/* This acts as the unselectable placeholder */}
+                  <option value="" disabled>Select a position...</option>
+
+                  {/* Your predefined choices */}
+                  <option value="Executive Chef">Executive Chef</option>
+                  <option value="Sous Chef">Sous Chef</option>
+                  <option value="Line Cook">Line Cook</option>
+                  <option value="Prep Cook">Prep Cook</option>
+                  <option value="Kitchen Porter">Kitchen Porter</option>
+                </select>
+
+                {/* Optional: A small dropdown arrow on the right side so they know it's clickable */}
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
 
