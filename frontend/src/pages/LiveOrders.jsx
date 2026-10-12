@@ -32,7 +32,7 @@ export default function LiveOrders() {
 
     socket.on("order_updated", (updatedOrder) => {
       setOrders(prevOrders =>
-        prevOrders.map(order => order.id === updatedOrder.id ? updatedOrder : order)
+        prevOrders.map(order => order.id === updatedOrder.id ? { ...order, status: updatedOrder.status } : order)
       );
     });
 
