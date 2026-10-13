@@ -2,6 +2,18 @@ import bcrypt from "bcrypt";
 import { prisma } from "../config/db.js";
 import jwt from "jsonwebtoken";
 
+function hasInvalidNameChars(txt) {
+  // [^ ... ] means "Find anything that is NOT inside these brackets"
+  // \p{L} allows any letter from any language
+  // \s allows spaces
+  // \- allows hyphens (for names like Jean-Luc)
+  // The 'u' at the end enables Unicode support for \p{L}
+  const regex = /[^\p{L}\s\-]/u;
+
+  // This will return TRUE if the name contains numbers or special characters
+  return regex.test(txt);
+}
+
 export const createStaff = async (req, res) => {
   try {
     const { name, email, password, position } = req.body;
@@ -10,6 +22,12 @@ export const createStaff = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Please provide name, email, and password." });
+    }
+
+    if (hasInvalidNameChars(name)) {
+      return res.status(400).json({
+        message: "Name can only contain letters, spaces, and hyphens.",
+      });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
