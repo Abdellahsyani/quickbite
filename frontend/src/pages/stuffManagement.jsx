@@ -146,15 +146,27 @@ export default function StaffManagement() {
                   onChange={(e) => setFormData({ ...formData, position: e.target.value })}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#2563eb] transition-all font-medium text-slate-900 cursor-pointer appearance-none"
                 >
-                  {/* This acts as the unselectable placeholder */}
                   <option value="" disabled>Select a position...</option>
 
-                  {/* Your predefined choices */}
-                  <option value="Executive Chef">Executive Chef</option>
-                  <option value="Sous Chef">Sous Chef</option>
-                  <option value="Line Cook">Line Cook</option>
-                  <option value="Prep Cook">Prep Cook</option>
-                  <option value="Kitchen Porter">Kitchen Porter</option>
+                  <optgroup label="Management">
+                    <option value="General Manager">General Manager</option>
+                    <option value="Restaurant Manager">Restaurant Manager</option>
+                  </optgroup>
+
+                  <optgroup label="Front of House (Service)">
+                    <option value="Cashier">Cashier</option>
+                    <option value="Server">Server / Waiter</option>
+                    <option value="Host">Host / Hostess</option>
+                    <option value="Bartender">Bartender</option>
+                  </optgroup>
+
+                  <optgroup label="Back of House (Kitchen)">
+                    <option value="Executive Chef">Executive Chef</option>
+                    <option value="Sous Chef">Sous Chef</option>
+                    <option value="Line Cook">Line Cook</option>
+                    <option value="Prep Cook">Prep Cook</option>
+                    <option value="Kitchen Porter">Kitchen Porter</option>
+                  </optgroup>
                 </select>
 
                 {/* Optional: A small dropdown arrow on the right side so they know it's clickable */}
