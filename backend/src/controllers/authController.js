@@ -23,7 +23,11 @@ export const createStaff = async (req, res) => {
         .status(400)
         .json({ message: "Please provide name, email, and password." });
     }
-
+    if (password.length < 4) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 4 characters long" });
+    }
     if (hasInvalidNameChars(name)) {
       return res.status(400).json({
         message: "Name can only contain letters, spaces, and hyphens.",
@@ -92,6 +96,17 @@ export const getStaff = async (req, res) => {
   }
 };
 
+function isStrongPassword(password) {
+  // Regex Breakdown:
+  // (?=.*[a-z])   -> At least one lowercase letter
+  // (?=.*[A-Z])   -> At least one uppercase letter
+  // (?=.*\d)      -> At least one number
+  // (?=.*[\W_])   -> At least one special character (e.g., !@#$%^&*)
+  // .{8,}         -> Minimum 8 characters total
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  return regex.test(password);
+}
+
 export const register = async (req, res) => {
   try {
     // Notice we removed 'role' from req.body and added 'token'
@@ -100,6 +115,19 @@ export const register = async (req, res) => {
     if (!name || !email || !password || !token) {
       return res.status(400).json({
         message: "Please provide name, email, password, and an invite token",
+      });
+    }
+
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({
+        message:
+          "password must be at least 8 characters long and include uppercase letter, a lowercase letter, a number, and a special character",
+      });
+    }
+
+    if (hasInvalidNameChars(name)) {
+      return res.status(400).json({
+        message: "Name can only contain letters, spaces, and hyphens.",
       });
     }
 
