@@ -7,24 +7,24 @@ async function main() {
   console.log("🌱 Seeding database...");
   console.log("Bypassing API and injecting admin...");
 
-  const hashedPassword = await bcrypt.hash("admin123", 10);
+  const hashedPassword = await bcrypt.hash("admin", 10);
 
   // Use upsert so you can run this script safely as many times as you want
   const admin = await prisma.user.upsert({
-    where: { email: "abdo@gmail.com" },
+    where: { email: "abdellah@gmail.com" },
     update: {
       password: hashedPassword,
-      role: "admin",
+      role: "moderator",
     },
     create: {
-      name: "abdo",
-      email: "abdo@gmail.com",
+      name: "abdellah",
+      email: "abdellah@gmail.com",
       password: hashedPassword,
-      role: "admin",
+      role: "moderator",
     },
   });
 
-  console.log("✅ Admin account secured for:", admin.email);
+  console.log("✅ Moderator account secured for:", admin.email);
 }
 
 main()

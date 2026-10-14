@@ -36,6 +36,10 @@ export default function App() {
             <Route path="ModeratorDashboard" element={<ModeratorDashboard />} />
           </Route>
 
+          <Route element={<ProtectedRoute allowedRoles={['moderator']} />}>
+            <Route path="ModeratorDashboard" element={<ModeratorDashboard />} />
+          </Route>
+
         </Route>
 
       </Routes>
