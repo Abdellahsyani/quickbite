@@ -1,6 +1,26 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../config/db.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+
+export const generateInviteLink = async (req, res) => {
+  try {
+    const token = crypto.randomBytes(16).toString("hex");
+
+    await prisma.invite.create({
+      data: {
+        token: token,
+        isUsed: false,
+      },
+    });
+    const inviteUrl = `http://localhost:5173/register?token=${token}`;
+    return res.status(201).json({ inviteUrl });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server Error", error: error.message });
+  }
+};
 
 function hasInvalidNameChars(txt) {
   // [^ ... ] means "Find anything that is NOT inside these brackets"
