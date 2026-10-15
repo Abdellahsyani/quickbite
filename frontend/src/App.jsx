@@ -20,6 +20,10 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/order" element={<CustomerOrder />} />
 
+        <Route element={<ProtectedRoute allowedRoles={['moderator']} />}>
+          <Route path="moderator" element={<ModeratorDashboard />} />
+        </Route>
+
         {/* --- 2. STAFF LAYOUT (The shared sidebar/header) --- */}
         <Route path="/" element={<Layout />}>
 
@@ -35,9 +39,6 @@ export default function App() {
             <Route path="staff" element={<StaffManagement />} />
           </Route>
 
-          <Route element={<ProtectedRoute allowedRoles={['moderator']} />}>
-            <Route path="moderator" element={<ModeratorDashboard />} />
-          </Route>
 
         </Route>
 
