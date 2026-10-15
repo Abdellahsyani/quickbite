@@ -147,8 +147,14 @@ export const updateOrderStatus = async (req, res) => {
     }
     const updateOrder = await prisma.order.update({
       where: { id: orderId },
-      data: {
-        status,
+      data: { status },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        items: {
+          include: {
+            menuItem: { select: { name: true } },
+          },
+        },
       },
     });
     const io = req.app.get("io");
