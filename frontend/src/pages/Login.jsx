@@ -27,6 +27,8 @@ export default function Login() {
       // 4. Send them to the correct page based on their job title
       if (user.role === 'admin') {
         navigate('/AdminDashboard');
+      } else if (user.role === 'moderator') {
+        navigate('/moderator');
       } else {
         navigate('/'); // The Kitchen board
       }

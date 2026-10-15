@@ -13,7 +13,7 @@ export default function ProtectedRoute({ allowedRoles }) {
   // 3. Are they allowed in this specific room?
   if (allowedRoles && !allowedRoles.includes(userRole)) {
     // If a Chef tries to get into the Admin Dashboard, kick them back to the kitchen.
-    if (userRole === 'member') {
+    if (userRole === 'staff') {
       return <Navigate to="/" replace />;
     }
     // Fallback for anyone else acting suspicious

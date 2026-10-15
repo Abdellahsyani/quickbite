@@ -33,11 +33,10 @@ export default function App() {
             <Route path="menu" element={<Menu />} />
             <Route path="AdminDashboard" element={<AdminDashboard />} />
             <Route path="staff" element={<StaffManagement />} />
-            <Route path="ModeratorDashboard" element={<ModeratorDashboard />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['moderator']} />}>
-            <Route path="ModeratorDashboard" element={<ModeratorDashboard />} />
+            <Route path="moderator" element={<ModeratorDashboard />} />
           </Route>
 
         </Route>
