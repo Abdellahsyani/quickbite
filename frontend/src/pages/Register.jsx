@@ -36,7 +36,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/register', { ...formData, token });
+      await api.post('/auth/register', { ...formData, token });
       alert("Account created! You can now log in.");
       navigate('/login');
     } catch (err) {
