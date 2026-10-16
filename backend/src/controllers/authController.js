@@ -72,6 +72,7 @@ export const createStaff = async (req, res) => {
         position,
         isActive: true,
         role: "staff",
+        restaurantId: req.user.restaurantId,
       },
       select: {
         id: true,
@@ -179,12 +180,18 @@ export const register = async (req, res) => {
         email,
         password: hashedPassword,
         role: "admin", // <-- Never trust req.body.role for public registration!
+        restaurant: {
+          create: {
+            name: name,
+          },
+        },
       },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        restaurantId: true,
         createdAt: true,
       },
     });
@@ -197,7 +204,7 @@ export const register = async (req, res) => {
 
     // 4. GENERATE PASSPORT: Log them in instantly
     const jwtToken = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role, restaurantId: user.restaurantId },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "1d" },
     );
