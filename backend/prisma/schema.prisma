@@ -29,8 +29,21 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   orders Order[]
+  restaurantId Int?        @map("restaurant_id")
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@map("users")
+}
+
+model Restaurant {
+  id        Int         @id @default(autoincrement())
+  name      String
+  users     User[]
+  menuItems MenuItem[]
+  orders    Order[]
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  @@map("restaurants")
 }
 
 model MenuItem {
@@ -46,6 +59,8 @@ model MenuItem {
   updatedAt   DateTime    @updatedAt @map("updated_at")
 
   orderItems OrderItem[]
+  restaurantId Int?        @map("restaurant_id")
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@map("menu_items")
 }
@@ -63,6 +78,8 @@ model Order {
   updatedAt  DateTime    @updatedAt @map("updated_at")
 
   items OrderItem[]
+  restaurantId Int?        @map("restaurant_id")
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@map("orders")
 }
