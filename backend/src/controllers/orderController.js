@@ -10,6 +10,12 @@ export const createOrder = async (req, res) => {
         .status(400)
         .json({ message: "Order must containe at least one item" });
     }
+    if (!restaurantId) {
+      return res
+        .status(400)
+        .json({ message: "Restaurant ID is required to place an order" });
+    }
+    const parsedRestaurantId = parseInt(restaurantId, 10);
 
     for (const item of items) {
       if (
@@ -27,8 +33,8 @@ export const createOrder = async (req, res) => {
     const dbMenuItems = await prisma.menuItem.findMany({
       where: {
         id: {
-          restaurantId: req.user.restaurantId,
           in: uniqueItemIds,
+          restaurantId: parsedRestaurantId,
         },
       },
     });
@@ -58,14 +64,11 @@ export const createOrder = async (req, res) => {
     }
 
     const newOrder = await prisma.order.create({
-      where: {
-        restaurantId: req.user.restaurantId,
-      },
       data: {
         userId,
         table: table || "Takeout", // 2. SAVE the table
         totalPrice: parseFloat(totalPrice.toFixed(2)),
-        restaurantId: parseInt(restaurantId),
+        restaurantId: parsedRestaurantId,
         items: {
           create: orderItemsData,
         },
@@ -207,13 +210,19 @@ export const clearOrder = async (req, res) => {
     if (isNaN(itemid)) {
       return res.status(400).json({ message: "Invalid Order ID" });
     }
-    const clearedItem = await prisma.order.update({
+    const clearedItem = await prisma.order.updateMany({
       where: {
         id: itemid,
         restaurantId: req.user.restaurantId,
       },
       data: { status: "ARCHIVED" },
     });
+
+    if (clearedItem.count == 0) {
+      return res
+        .status(404)
+        .json({ message: "Order not found or unauthorized" });
+    }
     return res
       .status(201)
       .json({ message: "Item delteted successfully", itemid: clearedItem });

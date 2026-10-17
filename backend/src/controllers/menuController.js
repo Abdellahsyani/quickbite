@@ -1,3 +1,4 @@
+import { parse } from "dotenv";
 import { prisma } from "../config/db.js";
 
 export const createMenuItem = async (req, res) => {
@@ -14,20 +15,22 @@ export const createMenuItem = async (req, res) => {
         .status(400)
         .json({ message: "Name, Price,, and category are required" });
     }
+    if (!restaurantId) {
+      return res.status(404).json({ message: "Invalid restaurant ID" });
+    }
+    const parsedRestaurantId = parseInt(restaurantId, 10);
     let imageUrl = null;
     if (req.file) {
       imageUrl = `/uploads/menu/${req.file.filename}`;
     }
     const newItem = await prisma.menuItem.create({
-      where: {
-        restaurantId: req.user.restaurantId,
-      },
       data: {
         name,
         description,
         price: parseFloat(price),
         category,
         imageUrl,
+        restaurantId: res.user.restaurantId,
       },
     });
     return res.status(201).json({ message: "Menu Item created" });
@@ -81,19 +84,23 @@ export const getMenuItemById = async (req, res) => {
 export const updateMenuItem = async (req, res) => {
   try {
     const { name, description, price, category, isAvailable } = req.body;
+    const { restaurantId } = req.query;
     const { id } = req.params;
-
     const itemId = parseInt(id, 10);
+
+    if (!restaurantId) {
+      return res.status(400).json({ message: "Restaurant ID is required" });
+    }
     if (price !== undefined && isNaN(parseFloat(price))) {
       return res.status(400).json({ message: "Price must be a valid number" });
     }
     if (isNaN(itemId)) {
       return res.status(400).json({ message: "Invalid menu item ID" });
     }
-    const updateItem = await prisma.menuItem.update({
+    const updateItem = await prisma.menuItem.updateMany({
       where: {
         id: itemId,
-        restaurantId: req.user.restaurantId,
+        restaurantId: parseInt(restaurantId, 10),
       },
       data: {
         ...(name && { name }),
@@ -103,6 +110,11 @@ export const updateMenuItem = async (req, res) => {
         ...(isAvailable !== undefined && { isAvailable }),
       },
     });
+    if (updateItem.count === 0) {
+      return res
+        .status(404)
+        .json({ message: "Item not found or unauthorized" });
+    }
     return res
       .status(200)
       .json({ message: "Item updated successfully", item: updateItem });
@@ -123,13 +135,18 @@ export const deleteMenuItem = async (req, res) => {
     if (isNaN(itemId)) {
       return res.status(400).json({ message: "Invalid Item ID" });
     }
-    const deletedItem = await prisma.menuItem.update({
+    const deletedItem = await prisma.menuItem.updateMany({
       where: {
         id: itemId,
         restaurantId: req.user.restaurantId,
       },
       data: { isDeleted: true },
     });
+    if (updateItem.count === 0) {
+      return res
+        .status(404)
+        .json({ message: "Item not found or unauthorized" });
+    }
     return res
       .status(200)
       .json({ message: "Item deleted successfully", item: deletedItem });
