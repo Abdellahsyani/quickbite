@@ -3,7 +3,7 @@ import { prisma, OrderStatus } from "../config/db.js";
 export const createOrder = async (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;
-    const { items, table } = req.body;
+    const { items, table, restaurantId } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res
@@ -26,7 +26,10 @@ export const createOrder = async (req, res) => {
     const uniqueItemIds = [...new Set(items.map((item) => item.menuItemId))];
     const dbMenuItems = await prisma.menuItem.findMany({
       where: {
-        id: { in: uniqueItemIds },
+        id: {
+          restaurantId: req.user.restaurantId,
+          in: uniqueItemIds,
+        },
       },
     });
     if (dbMenuItems.length !== uniqueItemIds.length) {
@@ -55,10 +58,14 @@ export const createOrder = async (req, res) => {
     }
 
     const newOrder = await prisma.order.create({
+      where: {
+        restaurantId: req.user.restaurantId,
+      },
       data: {
         userId,
         table: table || "Takeout", // 2. SAVE the table
         totalPrice: parseFloat(totalPrice.toFixed(2)),
+        restaurantId: parseInt(restaurantId),
         items: {
           create: orderItemsData,
         },
@@ -85,11 +92,19 @@ export const getMyOrder = async (req, res) => {
   try {
     const userId = req.user.id;
     const orders = await prisma.order.findMany({
-      where: { userId },
+      where: {
+        userId,
+        restaurantId: req.user.restaurantId,
+      },
       include: {
         items: {
           include: {
-            menuItem: { select: { name: true, category: true } },
+            menuItem: {
+              select: {
+                name: true,
+                category: true,
+              },
+            },
           },
         },
       },
@@ -106,6 +121,9 @@ export const getMyOrder = async (req, res) => {
 export const getAllOrders = async (req, res) => {
   try {
     const allOrders = await prisma.order.findMany({
+      where: {
+        restaurantId: req.user.restaurantId,
+      },
       include: {
         user: {
           select: { id: true, name: true, email: true },
@@ -145,16 +163,25 @@ export const updateOrderStatus = async (req, res) => {
     ) {
       return res.status(400).json({ message: "Not a valide status" });
     }
-    const updateOrder = await prisma.order.update({
+    const updateResult = await prisma.order.updateMany({
+      where: {
+        id: orderId,
+        restaurantId: req.user.restaurantId,
+      },
+      data: {
+        status,
+      },
+    });
+    if (updateResult.count == 0) {
+      return res
+        .status(404)
+        .json({ message: "Order not found or unauthorized" });
+    }
+    const updateOrder = await prisma.order.findUnique({
       where: { id: orderId },
-      data: { status },
       include: {
         user: { select: { id: true, name: true, email: true } },
-        items: {
-          include: {
-            menuItem: { select: { name: true } },
-          },
-        },
+        items: { include: { menuItem: { select: { name: true } } } },
       },
     });
     const io = req.app.get("io");
@@ -181,7 +208,10 @@ export const clearOrder = async (req, res) => {
       return res.status(400).json({ message: "Invalid Order ID" });
     }
     const clearedItem = await prisma.order.update({
-      where: { id: itemid },
+      where: {
+        id: itemid,
+        restaurantId: req.user.restaurantId,
+      },
       data: { status: "ARCHIVED" },
     });
     return res

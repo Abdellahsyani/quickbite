@@ -19,7 +19,16 @@ export const createMenuItem = async (req, res) => {
       imageUrl = `/uploads/menu/${req.file.filename}`;
     }
     const newItem = await prisma.menuItem.create({
-      data: { name, description, price: parseFloat(price), category, imageUrl },
+      where: {
+        restaurantId: req.user.restaurantId,
+      },
+      data: {
+        name,
+        description,
+        price: parseFloat(price),
+        category,
+        imageUrl,
+      },
     });
     return res.status(201).json({ message: "Menu Item created" });
   } catch (error) {
@@ -34,6 +43,7 @@ export const getMenuItems = async (req, res) => {
     const MenuItem = await prisma.menuItem.findMany({
       where: {
         isDeleted: false,
+        restaurantId: req.user.restaurantId,
       },
     });
     return res.status(200).json(MenuItem);
@@ -54,6 +64,7 @@ export const getMenuItemById = async (req, res) => {
     const MenuItemId = await prisma.menuItem.findUnique({
       where: {
         id: itemId,
+        restaurantId: req.user.restaurantId,
       },
     });
     if (!MenuItemId) {
@@ -80,7 +91,10 @@ export const updateMenuItem = async (req, res) => {
       return res.status(400).json({ message: "Invalid menu item ID" });
     }
     const updateItem = await prisma.menuItem.update({
-      where: { id: itemId },
+      where: {
+        id: itemId,
+        restaurantId: req.user.restaurantId,
+      },
       data: {
         ...(name && { name }),
         ...(description !== undefined && { description }),
@@ -112,6 +126,7 @@ export const deleteMenuItem = async (req, res) => {
     const deletedItem = await prisma.menuItem.update({
       where: {
         id: itemId,
+        restaurantId: req.user.restaurantId,
       },
       data: { isDeleted: true },
     });
