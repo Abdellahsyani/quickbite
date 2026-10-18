@@ -99,7 +99,11 @@ export const createStaff = async (req, res) => {
 export const getStaff = async (req, res) => {
   try {
     const staff = await prisma.user.findMany({
-      where: { role: "staff", isActive: true },
+      where: {
+        role: "staff",
+        isActive: true,
+        restaurantId: req.user.restaurantId,
+      },
       select: {
         id: true,
         name: true,
@@ -242,11 +246,15 @@ export const login = async (req, res) => {
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ messgae: "Invalid email or password" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
     // generate token jwt
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      {
+        id: user.id,
+        role: user.role,
+        restaurantId: user.restaurantId,
+      },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "1d" },
     );
@@ -258,6 +266,7 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        restaurantId: user.restaurantId,
       },
     });
   } catch (error) {
