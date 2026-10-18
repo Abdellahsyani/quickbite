@@ -78,7 +78,9 @@ export const createOrder = async (req, res) => {
       },
     });
     const io = req.app.get("io");
-    if (io) io.emit("new_order", newOrder);
+    if (io) {
+      io.to(`restaurant_$(parsedRestaurantId)`).emit("new_order", newOrder);
+    }
 
     return res
       .status(201)

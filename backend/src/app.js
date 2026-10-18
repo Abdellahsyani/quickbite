@@ -28,6 +28,12 @@ app.set("io", io);
 io.on("connection", (socket) => {
   console.log(`🟢 New KDS connected! Socket ID: ${socket.id}`);
 
+  // Listen to front end telling us which restaurant is belongs to
+  socket.on("join_restaurant", (restaurantId) => {
+    socket.join(`restaurant_${restaurantId}`);
+    console.log(`Socket ${socket.id} joined room: restaurant_${restaurantId}`);
+  });
+
   socket.on("disconnect", () => {
     console.log(`🔴 KDS disconnected! Socket ID: ${socket.id}`);
   });

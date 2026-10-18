@@ -43,10 +43,17 @@ export const createMenuItem = async (req, res) => {
 
 export const getMenuItems = async (req, res) => {
   try {
+    const restaurantId = req.user
+      ? req.user.restaurantId
+      : req.query.restaurantId;
+
+    if (!restaurantId) {
+      return res.status(400).json({ message: "Restaurant ID is required" });
+    }
     const MenuItem = await prisma.menuItem.findMany({
       where: {
         isDeleted: false,
-        restaurantId: req.user.restaurantId,
+        restaurantId: parseInt(restaurantId, 10),
       },
     });
     return res.status(200).json(MenuItem);
@@ -61,13 +68,20 @@ export const getMenuItemById = async (req, res) => {
   try {
     const { id } = req.params;
     const itemId = parseInt(id, 10);
+    const restaurantId = req.user
+      ? req.user.restaurantId
+      : req.query.restaurantId;
+
+    if (!restaurantId) {
+      return res.status(400).json({ message: "Restaurant ID is required" });
+    }
     if (isNaN(itemId)) {
       return res.status(400).json({ message: "Invalid menu item ID" });
     }
     const MenuItemId = await prisma.menuItem.findUnique({
       where: {
         id: itemId,
-        restaurantId: req.user.restaurantId,
+        restaurantId: parseInt(restaurantId, 10),
       },
     });
     if (!MenuItemId) {
