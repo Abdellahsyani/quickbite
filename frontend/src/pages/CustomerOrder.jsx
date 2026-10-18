@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ShoppingBag, Minus, Plus, Trash2, Star, Flame, Leaf, Search, CheckCircle } from 'lucide-react';
 import api from '../api';
 
 export default function CustomerOrder() {
   const navigate = useNavigate();
+  const { restaurantId } = useParams();
   const [menuItems, setMenuItems] = useState([]);
   const [cart, setCart] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -17,10 +18,10 @@ export default function CustomerOrder() {
   const [placedOrderId, setPlacedOrderId] = useState(null);
 
   useEffect(() => {
-    api.get('/menu').then(res => {
+    api.get(`/menu?restaurantId=${restaurantId}`).then(res => {
       setMenuItems(res.data.filter(item => item.isAvailable !== false));
     });
-  }, []);
+  }, [restaurantId]);
 
   const categories = ['All', 'Burgers', 'Sides', 'Drinks', 'Salads', 'Wraps', 'Desserts'];
   const filteredItems = menuItems.filter(item => {
@@ -70,11 +71,12 @@ export default function CustomerOrder() {
     try {
       const response = await api.post('/orders', {
         table: finalTableString,
-        items: formattedItems
+        items: formattedItems,
+        restaurantId: restaurantId,
       });
 
       // Save the new order's ID so we can track it
-      setPlacedOrderId(response.data.id);
+      setPlacedOrderId(response.data.order.id);
 
       // Show popup, clear cart
       setShowSuccess(true);

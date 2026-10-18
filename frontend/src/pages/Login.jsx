@@ -23,6 +23,7 @@ export default function Login() {
 
       localStorage.setItem('token', token);
       localStorage.setItem('role', user.role); // Make sure your backend sends the role here!
+      localStorage.setItem('restaurantId', user.restaurantId);
 
       // 4. Send them to the correct page based on their job title
       if (user.role === 'admin') {

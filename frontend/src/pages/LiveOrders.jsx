@@ -24,7 +24,11 @@ export default function LiveOrders() {
     fetchOrders();
 
     const socket = io('http://localhost:3000');
+    const myRestaurantId = localStorage.getItem('restaurantId');
 
+    if (myRestaurantId) {
+      socket.emit("join_restaurant", myRestaurantId)
+    }
     socket.on("new_order", (newOrder) => {
       console.log("INCOMING TICKET:", newOrder);
       setOrders(prevOrders => [...prevOrders, newOrder]);

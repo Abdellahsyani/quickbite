@@ -18,7 +18,7 @@ export default function App() {
         {/* --- 1. PUBLIC ROUTES (Anyone can access these) --- */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/order" element={<CustomerOrder />} />
+        <Route path="/order/:restaurantId" element={<CustomerOrder />} />
 
         <Route element={<ProtectedRoute allowedRoles={['moderator']} />}>
           <Route path="moderator" element={<ModeratorDashboard />} />
