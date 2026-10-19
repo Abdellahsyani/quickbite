@@ -31,15 +31,19 @@ export const deactivateStaff = async (req, res) => {
       return res.status(400).json({ message: "Invalid Id format" });
     }
 
-    const updateUser = await prisma.user.update({
+    const updateUser = await prisma.user.updateMany({
       where: {
         id: staffId,
         restaurantId,
         role: "staff",
       },
       data: { isActive: false },
-      select: { id: true, name: true, email: true, isActive: true },
     });
+    if (updateUser.count === 0) {
+      return res
+        .status(404)
+        .json({ message: "Staff member not found or unauthorized" });
+    }
     req.app.get("io")?.in(`user_${staffId}`).disconnectSockets(true);
     return res.status(200).json({
       message: "Staff member deactivate successfully",
