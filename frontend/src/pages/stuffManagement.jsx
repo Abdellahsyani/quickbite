@@ -22,7 +22,8 @@ export default function StaffManagement() {
 
   // Load the staff list immediately when the page opens
   useEffect(() => {
-    fetchStaff();
+    const timer = setTimeout(fetchStaff, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // 2. Submit the form to create a new chef

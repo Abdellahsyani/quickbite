@@ -90,8 +90,8 @@ export const createStaff = async (req, res) => {
       .json({ message: "Chef account created successfully!", staff });
   } catch (error) {
     return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+      .status(error.status || (error.code === "P2002" ? 400 : 500))
+      .json({ message: error.status ? error.message : "Server error", error: error.message });
   }
 };
 
@@ -116,8 +116,8 @@ export const getStaff = async (req, res) => {
     return res.status(200).json(staff);
   } catch (error) {
     return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+      .status(error.status || (error.code === "P2002" ? 400 : 500))
+      .json({ message: error.status ? error.message : "Server error", error: error.message });
   }
 };
 
@@ -178,32 +178,35 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 2. CREATE USER: Force the role to "admin"
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: "admin", // <-- Never trust req.body.role for public registration!
-        restaurant: {
-          create: {
-            name: name,
+    const user = await prisma.$transaction(async (tx) => {
+      const claimed = await tx.invite.updateMany({ where: { token, isUsed: false }, data: { isUsed: true } });
+      if (claimed.count !== 1) {
+        const error = new Error("Invalid or expired invite link.");
+        error.status = 403;
+        throw error;
+      }
+      return tx.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          role: "admin", // <-- Never trust req.body.role for public registration!
+          restaurant: {
+            create: {
+              name: name,
+            },
           },
         },
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        restaurantId: true,
-        createdAt: true,
-      },
-    });
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          restaurantId: true,
+          createdAt: true,
+        },
+      });
 
-    // 3. BURN THE TOKEN: Ensure it can never be used again
-    await prisma.invite.update({
-      where: { token },
-      data: { isUsed: true },
     });
 
     // 4. GENERATE PASSPORT: Log them in instantly
@@ -220,8 +223,8 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+      .status(error.status || (error.code === "P2002" ? 400 : 500))
+      .json({ message: error.status ? error.message : "Server error", error: error.message });
   }
 };
 
@@ -271,7 +274,7 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+      .status(error.status || (error.code === "P2002" ? 400 : 500))
+      .json({ message: error.status ? error.message : "Server error", error: error.message });
   }
 };

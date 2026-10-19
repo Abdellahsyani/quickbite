@@ -1,4 +1,3 @@
-import { parse } from "dotenv";
 import { prisma } from "../config/db.js";
 
 export const createMenuItem = async (req, res) => {
@@ -10,6 +9,7 @@ export const createMenuItem = async (req, res) => {
     // }
 
     const { name, description, price, category } = req.body;
+    const restaurantId = req.user.restaurantId;
     if (!name || !price || !category) {
       return res
         .status(400)
@@ -18,19 +18,18 @@ export const createMenuItem = async (req, res) => {
     if (!restaurantId) {
       return res.status(404).json({ message: "Invalid restaurant ID" });
     }
-    const parsedRestaurantId = parseInt(restaurantId, 10);
     let imageUrl = null;
     if (req.file) {
       imageUrl = `/uploads/menu/${req.file.filename}`;
     }
-    const newItem = await prisma.menuItem.create({
+    await prisma.menuItem.create({
       data: {
         name,
         description,
         price: parseFloat(price),
         category,
         imageUrl,
-        restaurantId: req.user.restaurantId,
+        restaurantId,
       },
     });
     return res.status(201).json({ message: "Menu Item created" });
@@ -98,7 +97,7 @@ export const getMenuItemById = async (req, res) => {
 export const updateMenuItem = async (req, res) => {
   try {
     const { name, description, price, category, isAvailable } = req.body;
-    const { restaurantId } = req.user.restaurantId;
+    const { restaurantId } = req.user;
     const { id } = req.params;
     const itemId = parseInt(id, 10);
 
@@ -117,6 +116,7 @@ export const updateMenuItem = async (req, res) => {
         restaurantId: parseInt(restaurantId, 10),
       },
       data: {
+        ...(req.file && { imageUrl: `/uploads/menu/${req.file.filename}` }),
         ...(name && { name }),
         ...(description !== undefined && { description }),
         ...(price !== undefined && { price: parseFloat(price) }),

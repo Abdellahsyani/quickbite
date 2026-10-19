@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Utensils, ChefHat, LogOut, Store, Users, User } from 'lucide-react';
+import { LayoutDashboard, Utensils, ChefHat, LogOut, Store, Users } from 'lucide-react';
 
 export default function Layout() {
   // Grab the user's role from their passport

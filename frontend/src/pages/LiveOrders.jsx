@@ -23,6 +23,8 @@ export default function LiveOrders() {
     const socket = io('http://localhost:3000', {
       auth: { token: localStorage.getItem('token') },
     });
+    fetchOrders();
+    const refreshTimer = setInterval(fetchOrders, 5000);
     socket.on('connect', fetchOrders);
     socket.on('connect_error', (error) => {
       console.error('Kitchen connection failed:', error.message);
@@ -40,6 +42,7 @@ export default function LiveOrders() {
     });
 
     return () => {
+      clearInterval(refreshTimer);
       socket.disconnect();
     };
   }, []);

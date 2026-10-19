@@ -32,6 +32,7 @@ io.use(async (socket, next) => {
       socket.handshake.auth?.token,
       process.env.JWT_SECRET,
     );
+    if (!Number.isInteger(decoded.id) || decoded.purpose) return next(new Error("Invalid token"));
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
       select: { isActive: true, role: true, restaurantId: true },
@@ -44,6 +45,7 @@ io.use(async (socket, next) => {
       return next(new Error("Access denied"));
     }
     socket.data.restaurantId = user.restaurantId;
+    socket.data.userId = decoded.id;
     next();
   } catch {
     next(new Error("Invalid or expired token"));
@@ -55,6 +57,7 @@ io.on("connection", (socket) => {
 
   // Membership comes from the authenticated account, never a client-supplied ID.
   socket.join(`restaurant_${socket.data.restaurantId}`);
+  socket.join(`user_${socket.data.userId}`);
 
   socket.on("disconnect", () => {
     console.log(`🔴 KDS disconnected! Socket ID: ${socket.id}`);

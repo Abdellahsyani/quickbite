@@ -32,7 +32,8 @@ export default function Menu() {
   };
 
   useEffect(() => {
-    fetchMenu();
+    const timer = setTimeout(fetchMenu, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleImageChange = (e) => {
@@ -312,9 +313,9 @@ export default function Menu() {
                       {/* Card Footer (Stats & Toggle) */}
                       <div className="flex justify-between items-center pt-4 border-t border-gray-50 mt-auto">
                         <div className="flex gap-4 text-[12px] text-gray-400">
-                          <span>{Math.floor(Math.random() * 400 + 300)} kcal</span>
+                          <span>{item.category}</span>
                           <span className="w-px bg-gray-200"></span>
-                          <span>{Math.floor(Math.random() * 10 + 5)} min prep</span>
+                          <span>{item.isAvailable ? "Available" : "Unavailable"}</span>
                         </div>
 
                         <button

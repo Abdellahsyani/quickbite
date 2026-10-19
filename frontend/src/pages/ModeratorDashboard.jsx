@@ -1,24 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link as LinkIcon, Copy, CheckCircle, TrendingUp, Store, Utensils, Activity } from 'lucide-react';
 import api from '../api';
 
 export default function ModeratorDashboard() {
   const [inviteLink, setInviteLink] = useState('');
   const [copied, setCopied] = useState(false);
-  const [platformStats, setPlatformStats] = useState({
-    totalRestaurants: 0,
-    totalGMV: 0,
-    activeOrders: 0,
-    topItems: []
-  });
-
-  // In the future, this will fetch the real aggregated data from your backend
-  /*
-  useEffect(() => {
-    api.get('/admin/platform-stats').then(res => setPlatformStats(res.data));
-  }, []);
-  */
-
   // Mock data for the layout structure
   const mockStats = {
     totalRestaurants: 12,

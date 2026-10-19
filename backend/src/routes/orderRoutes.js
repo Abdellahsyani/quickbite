@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createOrder,
+  trackOrder,
   getMyOrder,
   getAllOrders,
   updateOrderStatus,
@@ -12,7 +13,8 @@ import { authenticateToken } from "../middlewares/authMiddleware.js";
 const router = Router();
 
 router.post("/", createOrder);
-router.get("/mine", getMyOrder);
+router.get("/:id/track", trackOrder);
+router.get("/mine", authenticateToken, getMyOrder);
 
 router.use(authenticateToken);
 

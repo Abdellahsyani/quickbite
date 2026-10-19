@@ -1,4 +1,5 @@
-import { prisma, OrderStatus } from "../config/db.js";
+import jwt from "jsonwebtoken";
+import { prisma } from "../config/db.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -80,12 +81,14 @@ export const createOrder = async (req, res) => {
     });
     const io = req.app.get("io");
     if (io) {
-      io.to(`restaurant_$(parsedRestaurantId)`).emit("new_order", newOrder);
+      io.to(`restaurant_${parsedRestaurantId}`).emit("new_order", newOrder);
     }
 
     return res
       .status(201)
-      .json({ message: "Order placed successfully", order: newOrder });
+      .json({ message: "Order placed successfully", order: newOrder,
+        trackingToken: jwt.sign({ purpose: "order-tracking", orderId: newOrder.id }, process.env.JWT_SECRET, { expiresIn: "7d" }),
+      });
   } catch (error) {
     console.log("BACK-END ERROR:", error);
     return res
@@ -262,5 +265,26 @@ export const clearOrder = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Server error", error: error.message });
+  }
+};
+
+export const trackOrder = async (req, res) => {
+  let claims;
+  try {
+    claims = jwt.verify(req.query.token, process.env.JWT_SECRET);
+    if (claims.purpose !== "order-tracking" || claims.orderId !== Number(req.params.id)) throw new Error("Invalid token");
+  } catch {
+    return res.status(401).json({ message: "Invalid or expired tracking link" });
+  }
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: claims.orderId },
+      select: { id: true, status: true, table: true, totalPrice: true, createdAt: true,
+        items: { select: { quantity: true, menuItem: { select: { name: true } } } } },
+    });
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    return res.json(order);
+  } catch {
+    return res.status(500).json({ message: "Unable to fetch order" });
   }
 };

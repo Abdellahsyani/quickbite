@@ -15,7 +15,7 @@ export default function CustomerOrder() {
   const [tableNumber, setTableNumber] = useState('');
 
   const [showSuccess, setShowSuccess] = useState(false);
-  const [placedOrderId, setPlacedOrderId] = useState(null);
+  const [trackingLink, setTrackingLink] = useState('');
 
   useEffect(() => {
     api.get(`/menu?restaurantId=${restaurantId}`).then(res => {
@@ -76,7 +76,7 @@ export default function CustomerOrder() {
       });
 
       // Save the new order's ID so we can track it
-      setPlacedOrderId(response.data.order.id);
+      setTrackingLink(`/track/${response.data.order.id}?token=${encodeURIComponent(response.data.trackingToken)}`);
 
       // Show popup, clear cart
       setShowSuccess(true);
@@ -231,7 +231,7 @@ export default function CustomerOrder() {
 
             {/* NEW TRACKING BUTTON */}
             <button
-              onClick={() => navigate(`/track/${placedOrderId}`)}
+              onClick={() => navigate(trackingLink)}
               className="w-full bg-[#2563eb] hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95"
             >
               Track Order Progress

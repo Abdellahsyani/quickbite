@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Menu from './pages/Menu';
 import ProtectedRoute from './components/ProtectedRoute';
 import CustomerOrder from './pages/CustomerOrder';
+import TrackOrder from './pages/TrackOrder';
 import AdminDashboard from './pages/AdminDashboard';
 import StaffManagement from './pages/stuffManagement';
 import ModeratorDashboard from './pages/ModeratorDashboard';
@@ -18,6 +19,7 @@ export default function App() {
         {/* --- 1. PUBLIC ROUTES (Anyone can access these) --- */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/track/:id" element={<TrackOrder />} />
         <Route path="/order/:restaurantId" element={<CustomerOrder />} />
 
         <Route element={<ProtectedRoute allowedRoles={['moderator']} />}>
