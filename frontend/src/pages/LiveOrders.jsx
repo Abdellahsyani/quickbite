@@ -1,5 +1,4 @@
 import { Pause } from 'lucide-react';
-import Card from '../components/Card';
 import OrderCard from '../components/OrderCard';
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
@@ -19,19 +18,19 @@ export default function LiveOrders() {
       });
   };
 
-  // 2. Added the 5-second live-polling loop
+  // Refresh on each connection to recover orders missed while disconnected.
   useEffect(() => {
-    fetchOrders();
-
-    const socket = io('http://localhost:3000');
-    const myRestaurantId = localStorage.getItem('restaurantId');
-
-    if (myRestaurantId) {
-      socket.emit("join_restaurant", myRestaurantId)
-    }
+    const socket = io('http://localhost:3000', {
+      auth: { token: localStorage.getItem('token') },
+    });
+    socket.on('connect', fetchOrders);
+    socket.on('connect_error', (error) => {
+      console.error('Kitchen connection failed:', error.message);
+    });
     socket.on("new_order", (newOrder) => {
-      console.log("INCOMING TICKET:", newOrder);
-      setOrders(prevOrders => [...prevOrders, newOrder]);
+      setOrders(prevOrders => prevOrders.some(order => order.id === newOrder.id)
+        ? prevOrders
+        : [newOrder, ...prevOrders]);
     })
 
     socket.on("order_updated", (updatedOrder) => {

@@ -3,7 +3,8 @@ import { config } from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import { connectDB, disconnectDB } from "./config/db.js";
+import jwt from "jsonwebtoken";
+import { connectDB, prisma } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import menuRoutes from "./routes/menuRoutes.js";
@@ -25,14 +26,35 @@ const io = new Server(server, {
 
 app.set("io", io);
 
+io.use(async (socket, next) => {
+  try {
+    const decoded = jwt.verify(
+      socket.handshake.auth?.token,
+      process.env.JWT_SECRET,
+    );
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: { isActive: true, role: true, restaurantId: true },
+    });
+    if (
+      !user?.isActive ||
+      !["admin", "staff"].includes(user.role) ||
+      !user.restaurantId
+    ) {
+      return next(new Error("Access denied"));
+    }
+    socket.data.restaurantId = user.restaurantId;
+    next();
+  } catch {
+    next(new Error("Invalid or expired token"));
+  }
+});
+
 io.on("connection", (socket) => {
   console.log(`🟢 New KDS connected! Socket ID: ${socket.id}`);
 
-  // Listen to front end telling us which restaurant is belongs to
-  socket.on("join_restaurant", (restaurantId) => {
-    socket.join(`restaurant_${restaurantId}`);
-    console.log(`Socket ${socket.id} joined room: restaurant_${restaurantId}`);
-  });
+  // Membership comes from the authenticated account, never a client-supplied ID.
+  socket.join(`restaurant_${socket.data.restaurantId}`);
 
   socket.on("disconnect", () => {
     console.log(`🔴 KDS disconnected! Socket ID: ${socket.id}`);

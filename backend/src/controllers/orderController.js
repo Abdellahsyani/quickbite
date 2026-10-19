@@ -34,8 +34,9 @@ export const createOrder = async (req, res) => {
       where: {
         id: {
           in: uniqueItemIds,
-          restaurantId: parsedRestaurantId,
         },
+        restaurantId: parsedRestaurantId,
+        isDeleted: false,
       },
     });
     if (dbMenuItems.length !== uniqueItemIds.length) {
@@ -74,7 +75,7 @@ export const createOrder = async (req, res) => {
         },
       },
       include: {
-        items: true,
+        items: { include: { menuItem: { select: { name: true } } } },
       },
     });
     const io = req.app.get("io");
@@ -206,7 +207,10 @@ export const updateOrderStatus = async (req, res) => {
       },
     });
     const io = req.app.get("io");
-    io.emit("order_updated", updateOrder);
+    io?.to(`restaurant_${req.user.restaurantId}`).emit(
+      "order_updated",
+      updateOrder,
+    );
     return res
       .status(200)
       .json({ message: "Status Updated successfully", order: updateOrder });
@@ -241,6 +245,13 @@ export const clearOrder = async (req, res) => {
         .status(404)
         .json({ message: "Order not found or unauthorized" });
     }
+    req.app
+      .get("io")
+      ?.to(`restaurant_${req.user.restaurantId}`)
+      .emit("order_updated", {
+        id: itemid,
+        status: "ARCHIVED",
+      });
     return res
       .status(201)
       .json({ message: "Item delteted successfully", itemid: clearedItem });
