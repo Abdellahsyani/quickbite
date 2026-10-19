@@ -30,7 +30,7 @@ export const createMenuItem = async (req, res) => {
         price: parseFloat(price),
         category,
         imageUrl,
-        restaurantId: res.user.restaurantId,
+        restaurantId: req.user.restaurantId,
       },
     });
     return res.status(201).json({ message: "Menu Item created" });
@@ -98,7 +98,7 @@ export const getMenuItemById = async (req, res) => {
 export const updateMenuItem = async (req, res) => {
   try {
     const { name, description, price, category, isAvailable } = req.body;
-    const { restaurantId } = req.query;
+    const { restaurantId } = req.user.restaurantId;
     const { id } = req.params;
     const itemId = parseInt(id, 10);
 
@@ -156,7 +156,7 @@ export const deleteMenuItem = async (req, res) => {
       },
       data: { isDeleted: true },
     });
-    if (updateItem.count === 0) {
+    if (deletedItem.count === 0) {
       return res
         .status(404)
         .json({ message: "Item not found or unauthorized" });

@@ -183,10 +183,26 @@ export const updateOrderStatus = async (req, res) => {
         .json({ message: "Order not found or unauthorized" });
     }
     const updateOrder = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: {
+        id: orderId,
+      },
       include: {
-        user: { select: { id: true, name: true, email: true } },
-        items: { include: { menuItem: { select: { name: true } } } },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        items: {
+          include: {
+            menuItem: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
     const io = req.app.get("io");

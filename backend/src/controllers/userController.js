@@ -24,6 +24,7 @@ export const getMe = async (req, res) => {
 export const deactivateStaff = async (req, res) => {
   try {
     const { id } = req.params;
+    const restarantId = req.query;
     const staffId = parseInt(id, 10);
 
     if (isNaN(staffId)) {
@@ -31,7 +32,10 @@ export const deactivateStaff = async (req, res) => {
     }
 
     const updateUser = await prisma.user.update({
-      where: { id: staffId },
+      where: {
+        id: staffId,
+        restaurantId: parseInt(restaurantId, 10),
+      },
       data: { isActive: false },
     });
     return res.status(200).json({
