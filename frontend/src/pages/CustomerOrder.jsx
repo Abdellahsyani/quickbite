@@ -18,9 +18,33 @@ export default function CustomerOrder() {
   const [trackingLink, setTrackingLink] = useState('');
 
   useEffect(() => {
-    api.get(`/menu?restaurantId=${restaurantId}`).then(res => {
-      setMenuItems(res.data.filter(item => item.isAvailable !== false));
-    });
+    let active = true;
+
+    setLoading(true);
+    setError("");
+    setMenuItems([]);
+    setCart([]);
+
+    api.get(`/menu?restaurantId=${encodeURIComponent(restaurantId)}`)
+      .then(({ data }) => {
+        if (active) {
+          setMenuItems(data.filter(item => item.isAvailable !== false));
+        }
+      })
+      .catch(err => {
+        if (active) {
+          setError(
+            err.response?.data?.message || "Unable to load the menu."
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [restaurantId]);
 
   const categories = ['All', 'Burgers', 'Sides', 'Drinks', 'Salads', 'Wraps', 'Desserts'];

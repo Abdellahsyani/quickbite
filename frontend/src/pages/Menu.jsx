@@ -144,7 +144,18 @@ export default function Menu() {
   };
 
   if (loading) {
-    return <div className="p-8 text-gray-500">Loading catalog...</div>;
+    return <main className="p-8">Loading menu…</main>;
+  }
+
+  if (error) {
+    return (
+      <main className="p-8 text-center">
+        <h1 className="text-2xl font-bold">{error}</h1>
+        <p className="mt-3">
+          Please scan the restaurant’s QR code again or ask the staff.
+        </p>
+      </main>
+    );
   }
 
   return (
