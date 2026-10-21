@@ -10,6 +10,8 @@ export default function CustomerOrder() {
   const [cart, setCart] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [orderType, setOrderType] = useState('dine_in');
   const [tableNumber, setTableNumber] = useState('');
@@ -27,14 +29,26 @@ export default function CustomerOrder() {
 
     api.get(`/menu?restaurantId=${encodeURIComponent(restaurantId)}`)
       .then(({ data }) => {
-        if (active) {
-          setMenuItems(data.filter(item => item.isAvailable !== false));
+        if (!active) return;
+
+        if (!Array.isArray(data)) {
+          throw new Error("Expected an array of menu items.");
         }
+
+        if (data.some(item => !item || typeof item.name !== "string")) {
+          throw new Error("A menu item has a missing or invalid name.");
+        }
+
+        setMenuItems(data.filter(item => item.isAvailable !== false));
       })
       .catch(err => {
+        console.error("Menu loading failed:", err);
+
         if (active) {
           setError(
-            err.response?.data?.message || "Unable to load the menu."
+            err.response?.data?.message ||
+            err.message ||
+            "Unable to load the menu."
           );
         }
       })
@@ -112,9 +126,24 @@ export default function CustomerOrder() {
       alert(error.response?.data?.message || "Failed to send order.");
     }
   };
+  if (loading) {
+    return <main className="p-8">Loading menu…</main>;
+  }
+
+  if (error) {
+    return (
+      <main className="p-8 text-center">
+        <h1 className="text-2xl font-bold">{error}</h1>
+        <p className="mt-3">
+          Please scan the restaurant’s QR code again or ask the staff.
+        </p>
+      </main>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-[#f8f9fa]">
+      {/* Your existing page */}
 
       {/* LEFT: Premium Menu Browsing */}
       <div className="flex-1 flex flex-col overflow-hidden">

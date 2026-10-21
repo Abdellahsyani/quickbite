@@ -41,18 +41,17 @@ export default function App() {
             <Route path="staff" element={<StaffManagement />} />
           </Route>
 
-          <Route
-            path="*"
-            element={
-              <main className="p-8 text-center">
-                <h1 className="text-2xl font-bold">Page not found</h1>
-                <p>Please check the link or scan the restaurant’s QR code.</p>
-              </main>
-            }
-          />
-
-
         </Route>
+
+        <Route
+          path="*"
+          element={
+            <main className="p-8 text-center">
+              <h1 className="text-2xl font-bold">Page not found</h1>
+              <p>Please check the link or scan the restaurant’s QR code.</p>
+            </main>
+          }
+        />
 
       </Routes>
     </BrowserRouter>

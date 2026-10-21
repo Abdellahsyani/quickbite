@@ -5,7 +5,7 @@ import api from '../api';
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [error, setError] = useState("");
   // Filter States
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,11 +21,33 @@ export default function Menu() {
   const [imagePreview, setImagePreview] = useState(null);
 
   const fetchMenu = async () => {
+    setError("");
+
     try {
-      const response = await api.get('/menu');
-      setMenuItems(response.data);
-    } catch (error) {
-      console.error("Failed to fetch menu:", error);
+      const response = await api.get("/menu");
+      const items = response.data;
+
+      if (!Array.isArray(items)) {
+        throw new Error("Expected the menu response to be an array.");
+      }
+
+      if (
+        items.some(
+          item => !item || typeof item.name !== "string"
+        )
+      ) {
+        throw new Error("A menu item has a missing or invalid name.");
+      }
+
+      setMenuItems(items);
+    } catch (err) {
+      console.error("Failed to fetch menu:", err);
+
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        "Unable to load the menu."
+      );
     } finally {
       setLoading(false);
     }
