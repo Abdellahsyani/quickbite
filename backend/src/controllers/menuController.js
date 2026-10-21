@@ -42,17 +42,36 @@ export const createMenuItem = async (req, res) => {
 
 export const getMenuItems = async (req, res) => {
   try {
-    const restaurantId = req.user
+    const RawRestaurantId = req.user
       ? req.user.restaurantId
       : req.query.restaurantId;
 
-    if (!restaurantId) {
+    if (!RawRestaurantId) {
       return res.status(400).json({ message: "Restaurant ID is required" });
     }
+    const restaurantId = Number(RawRestaurantId);
+    if (
+      !/^[1-9]\d*$/.test(String(RawRestaurantId)) ||
+      !Number.isSafeInteger(restaurantId)
+    ) {
+      return res.status(400).json({
+        message: "Invalid restaurant link",
+      });
+    }
+    const restaurant = await prisma.restaurant.findUnique({
+      where: {
+        id: restaurantId,
+      },
+      select: { id: true },
+    });
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
     const MenuItem = await prisma.menuItem.findMany({
       where: {
+        restaurantId,
         isDeleted: false,
-        restaurantId: parseInt(restaurantId, 10),
       },
     });
     return res.status(200).json(MenuItem);
