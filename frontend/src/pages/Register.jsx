@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Store, Mail, Lock, ArrowRight, User } from 'lucide-react';
+import { Store, Mail, Lock, ArrowRight, User, MapPin, Phone } from 'lucide-react';
 import api from '../api'; // Your axios setup
 
 export default function Register() {
@@ -8,7 +8,7 @@ export default function Register() {
   const token = searchParams.get('token');
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', restaurantName: '', restaurantAddress: '', restaurantPhone: '' });
   const [error, setError] = useState('');
 
   // 1. IF NO TOKEN: Hide the form, show the SaaS sales landing page
@@ -60,7 +60,7 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Restaurant / Owner Name</label>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Owner Name</label>
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
               <input
@@ -68,6 +68,51 @@ export default function Register() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-medium text-slate-900"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="restaurantName" className="block text-sm font-bold text-slate-700 mb-2">Restaurant Name</label>
+            <div className="relative">
+              <Store className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input
+                id="restaurantName"
+                type="text"
+                required
+                value={formData.restaurantName}
+                onChange={(e) => setFormData({ ...formData, restaurantName: e.target.value })}
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-medium text-slate-900"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="restaurantAddress" className="block text-sm font-bold text-slate-700 mb-2">Restaurant Address</label>
+            <div className="relative">
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input
+                id="restaurantAddress"
+                type="text"
+                required
+                value={formData.restaurantAddress}
+                onChange={(e) => setFormData({ ...formData, restaurantAddress: e.target.value })}
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-medium text-slate-900"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="restaurantPhone" className="block text-sm font-bold text-slate-700 mb-2">Restaurant Phone</label>
+            <div className="relative">
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input
+                id="restaurantPhone"
+                type="tel"
+                required
+                value={formData.restaurantPhone}
+                onChange={(e) => setFormData({ ...formData, restaurantPhone: e.target.value })}
                 className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-medium text-slate-900"
               />
             </div>
