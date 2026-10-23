@@ -135,7 +135,15 @@ function isStrongPassword(password) {
 export const register = async (req, res) => {
   try {
     // Notice we removed 'role' from req.body and added 'token'
-    const { email, name, password, token } = req.body;
+    const { email, name, password, token, restaurantName, restaurantAddress, restaurantPhone } = req.body;
+
+    if ([restaurantName, restaurantAddress, restaurantPhone].some(
+      (value) => typeof value !== "string" || !value.trim(),
+    )) {
+      return res.status(400).json({
+        message: "Please provide restaurant name, address, and phone",
+      });
+    }
 
     if (!name || !email || !password || !token) {
       return res.status(400).json({
@@ -193,7 +201,9 @@ export const register = async (req, res) => {
           role: "admin", // <-- Never trust req.body.role for public registration!
           restaurant: {
             create: {
-              name: name,
+              name: restaurantName.trim(),
+              address: restaurantAddress.trim(),
+              phone: restaurantPhone.trim(),
             },
           },
         },

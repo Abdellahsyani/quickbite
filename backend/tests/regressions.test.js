@@ -96,6 +96,32 @@ test('registration rejects a token already claimed by a competing request', asyn
   prisma.user.findUnique = async () => null;
   prisma.$transaction = async callback => callback({ invite: { updateMany: async ({ where }) => { assert.equal(where.isUsed, false); return { count: 0 }; } }, user: { create: () => assert.fail('reused invite created an account') } });
   const res = response();
-  await register({ body: { name: 'Owner', email: 'owner@example.test', password: 'StrongPass1!', token: 'claimed-token' } }, res);
+  await register({ body: { name: 'Owner', email: 'owner@example.test', password: 'StrongPass1!', token: 'claimed-token', restaurantName: 'Bistro', restaurantAddress: '123 Main St', restaurantPhone: '+212 600 123456' } }, res);
   assert.equal(res.statusCode, 403);
+});
+
+
+test('registration requires nonblank restaurant details', async () => {
+  for (const value of [undefined, '', '   ', 123]) {
+    const res = response();
+    await register({ body: { restaurantName: 'Bistro', restaurantAddress: value, restaurantPhone: '+212 600 123456' } }, res);
+    assert.equal(res.statusCode, 400);
+    assert.match(res.body.message, /restaurant name, address, and phone/);
+  }
+});
+
+test('registration saves restaurant details separately from the owner', async () => {
+  prisma.invite.findUnique = async () => ({ isUsed: false });
+  prisma.user.findUnique = async () => null;
+  prisma.$transaction = async callback => callback({
+    invite: { updateMany: async () => ({ count: 1 }) },
+    user: { create: async ({ data }) => {
+      assert.equal(data.name, 'Owner');
+      assert.deepEqual(data.restaurant.create, { name: 'Bistro 42', address: '123 Main St', phone: '+212 600 123456' });
+      return { id: 1, role: 'admin', restaurantId: 5 };
+    } },
+  });
+  const res = response();
+  await register({ body: { name: 'Owner', email: 'owner@example.test', password: 'StrongPass1!', token: 'token', restaurantName: ' Bistro 42 ', restaurantAddress: ' 123 Main St ', restaurantPhone: ' +212 600 123456 ' } }, res);
+  assert.equal(res.statusCode, 201);
 });
