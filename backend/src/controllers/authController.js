@@ -288,3 +288,19 @@ export const login = async (req, res) => {
       .json({ message: error.status ? error.message : "Server error", error: error.message });
   }
 };
+
+
+export const getRestaurant = async (req, res) => {
+  try {
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { id: req.user.restaurantId },
+      select: { id: true, name: true },
+    });
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+    return res.json(restaurant);
+  } catch {
+    return res.status(500).json({ message: "Unable to load restaurant" });
+  }
+};

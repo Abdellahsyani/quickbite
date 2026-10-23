@@ -6,11 +6,11 @@ import { authenticateToken } from '../src/middlewares/authMiddleware.js';
 import { createMenuItem, updateMenuItem } from '../src/controllers/menuController.js';
 import { deactivateStaff } from '../src/controllers/userController.js';
 import { createOrder, trackOrder } from '../src/controllers/orderController.js';
-import { register } from '../src/controllers/authController.js';
+import { register, getRestaurant } from '../src/controllers/authController.js';
 
 process.env.JWT_SECRET = 'regression-test-secret';
 const response = () => ({ statusCode: 200, status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; return this; } });
-const original = { userFind: prisma.user.findUnique, menuCreate: prisma.menuItem.create, menuUpdate: prisma.menuItem.updateMany, userUpdate: prisma.user.update, menuFind: prisma.menuItem.findMany, orderCreate: prisma.order.create, orderFind: prisma.order.findUnique, inviteFind: prisma.invite.findUnique, transaction: prisma.$transaction };
+const original = { userFind: prisma.user.findUnique, menuCreate: prisma.menuItem.create, menuUpdate: prisma.menuItem.updateMany, userUpdate: prisma.user.update, menuFind: prisma.menuItem.findMany, orderCreate: prisma.order.create, orderFind: prisma.order.findUnique, inviteFind: prisma.invite.findUnique, transaction: prisma.$transaction, restaurantFind: prisma.restaurant.findUnique };
 after(async () => {
   prisma.user.findUnique = original.userFind;
   prisma.menuItem.create = original.menuCreate;
@@ -21,6 +21,7 @@ after(async () => {
   prisma.order.findUnique = original.orderFind;
   prisma.invite.findUnique = original.inviteFind;
   prisma.$transaction = original.transaction;
+  prisma.restaurant.findUnique = original.restaurantFind;
   await prisma.$disconnect();
 });
 
@@ -124,4 +125,28 @@ test('registration saves restaurant details separately from the owner', async ()
   const res = response();
   await register({ body: { name: 'Owner', email: 'owner@example.test', password: 'StrongPass1!', token: 'token', restaurantName: ' Bistro 42 ', restaurantAddress: ' 123 Main St ', restaurantPhone: ' +212 600 123456 ' } }, res);
   assert.equal(res.statusCode, 201);
+});
+
+
+test('restaurant branding uses the authenticated account restaurant ID', async () => {
+  prisma.restaurant.findUnique = async ({ where, select }) => {
+    assert.deepEqual(where, { id: 5 });
+    assert.deepEqual(select, { id: true, name: true });
+    return { id: 5, name: 'Bistro 42' };
+  };
+  const res = response();
+  await getRestaurant({ user: { restaurantId: 5 }, query: { restaurantId: '9' } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.body, { id: 5, name: 'Bistro 42' });
+});
+
+test('restaurant branding handles missing restaurants and database failures', async () => {
+  prisma.restaurant.findUnique = async () => null;
+  const missing = response();
+  await getRestaurant({ user: { restaurantId: 5 } }, missing);
+  assert.equal(missing.statusCode, 404);
+  prisma.restaurant.findUnique = async () => { throw new Error('Database unavailable'); };
+  const failed = response();
+  await getRestaurant({ user: { restaurantId: 5 } }, failed);
+  assert.equal(failed.statusCode, 500);
 });

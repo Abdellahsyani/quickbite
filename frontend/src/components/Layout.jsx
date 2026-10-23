@@ -1,9 +1,27 @@
+import { useEffect, useState } from 'react';
+import api from '../api';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Utensils, ChefHat, LogOut, Store, Users } from 'lucide-react';
 
 export default function Layout() {
   // Grab the user's role from their passport
   const role = localStorage.getItem('role');
+  const [restaurantName, setRestaurantName] = useState('');
+
+  useEffect(() => {
+    if (!['admin', 'staff'].includes(role)) return;
+    const controller = new AbortController();
+    api.get('/auth/restaurant', { signal: controller.signal })
+      .then(({ data }) => setRestaurantName(data.name))
+      .catch((error) => {
+        if (error.code !== 'ERR_CANCELED') console.error('Unable to load restaurant name', error);
+      });
+    return () => controller.abort();
+  }, [role]);
+
+  const brandName = ['admin', 'staff'].includes(role)
+    ? restaurantName || 'Restaurant'
+    : 'QuickBite';
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,10 +49,10 @@ export default function Layout() {
 
         {/* Brand Logo */}
         <div className="p-6 flex items-center gap-3 border-b border-slate-100">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-sm">
+          <div className="w-10 h-10 shrink-0 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-sm">
             <Store size={20} />
           </div>
-          <span className="text-xl font-black text-slate-900 tracking-tight">QuickBite</span>
+          <span className="min-w-0 break-words text-xl font-black text-slate-900 tracking-tight">{brandName}</span>
         </div>
 
         {/* Navigation Links */}
