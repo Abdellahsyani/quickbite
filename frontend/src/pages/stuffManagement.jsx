@@ -63,7 +63,7 @@ export default function StaffManagement() {
   };
 
   return (
-    <div className="p-8 bg-slate-50 min-h-screen">
+    <div className="p-4 sm:p-6 lg:p-8 bg-slate-50 min-h-dvh">
 
       {/* Page Header */}
       <div className="mb-8">
@@ -71,7 +71,7 @@ export default function StaffManagement() {
         <p className="text-slate-500 mt-1">Create and manage accounts for your kitchen team.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
 
         {/* LEFT COLUMN: CREATE STAFF FORM */}
         <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-fit">
@@ -190,7 +190,7 @@ export default function StaffManagement() {
         </div>
 
         {/* RIGHT COLUMN: ACTIVE STAFF LIST */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden h-fit">
+        <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden h-fit">
           <div className="p-6 border-b border-slate-100">
             <h3 className="font-bold text-lg text-slate-900 flex items-center gap-2">
               <ChefHat size={20} className="text-slate-400" />

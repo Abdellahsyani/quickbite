@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ShoppingBag, Minus, Plus, Trash2, Star, Flame, Leaf, Search, CheckCircle } from 'lucide-react';
-import api from '../api';
+import api, { menuImageURL } from '../api';
 
 export default function CustomerOrder() {
   const navigate = useNavigate();
@@ -142,21 +142,21 @@ export default function CustomerOrder() {
   }
 
   return (
-    <div className="flex h-screen bg-[#f8f9fa]">
+    <div className="flex min-h-dvh flex-col bg-[#f8f9fa] pb-24 lg:h-dvh lg:flex-row lg:pb-0">
       {/* Your existing page */}
 
       {/* LEFT: Premium Menu Browsing */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="bg-white px-8 py-6 border-b border-gray-200 shrink-0">
+      <div className="flex min-w-0 flex-1 flex-col lg:overflow-hidden">
+        <div className="bg-white px-4 py-5 sm:px-6 lg:px-8 border-b border-gray-200 shrink-0">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Place Order</h1>
 
-          <div className="flex items-center justify-between gap-6">
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex min-w-0 flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex w-full min-w-0 gap-2 overflow-x-auto pb-2 xl:flex-1">
               {categories.map(cat => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeCategory === cat
+                  className={`min-h-11 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeCategory === cat
                     ? 'bg-[#2563eb] text-white shadow-sm'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
@@ -166,10 +166,11 @@ export default function CustomerOrder() {
               ))}
             </div>
 
-            <div className="relative w-64 shrink-0">
+            <div className="relative w-full shrink-0 xl:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <input
                 type="text"
+                aria-label="Search menu"
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -179,11 +180,11 @@ export default function CustomerOrder() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 p-4 sm:p-6 lg:overflow-y-auto lg:p-8">
           {filteredItems.length === 0 ? (
             <div className="text-center py-20 text-gray-500">No items found matching your search.</div>
           ) : (
-            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
               {filteredItems.map(item => (
                 <MenuCard key={item.id} item={item} onAdd={addToCart} />
               ))}
@@ -193,7 +194,7 @@ export default function CustomerOrder() {
       </div>
 
       {/* RIGHT: Cart / Bucket Sidebar */}
-      <div className="w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl z-10 shrink-0">
+      <div id="order-cart" tabIndex={-1} className="scroll-mt-4 z-10 flex w-full shrink-0 flex-col border-t border-gray-200 bg-white shadow-xl lg:w-96 lg:border-l lg:border-t-0">
         <div className="p-6 border-b border-gray-100 bg-white">
           <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
             <ShoppingBag /> Current Order
@@ -204,13 +205,13 @@ export default function CustomerOrder() {
           <div className="flex bg-gray-200/60 p-1 rounded-lg">
             <button
               onClick={() => setOrderType('dine_in')}
-              className={`flex-1 py-1.5 text-sm font-bold rounded-md transition-all ${orderType === 'dine_in' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`min-h-11 flex-1 py-1.5 text-sm font-bold rounded-md transition-all ${orderType === 'dine_in' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
             >
               Dine In
             </button>
             <button
               onClick={() => setOrderType('takeout')}
-              className={`flex-1 py-1.5 text-sm font-bold rounded-md transition-all ${orderType === 'takeout' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`min-h-11 flex-1 py-1.5 text-sm font-bold rounded-md transition-all ${orderType === 'takeout' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
             >
               Takeout
             </button>
@@ -219,6 +220,7 @@ export default function CustomerOrder() {
           {orderType === 'dine_in' && (
             <input
               type="text"
+              aria-label="Table number"
               placeholder="Enter Table Number (e.g. 12)"
               value={tableNumber}
               onChange={(e) => setTableNumber(e.target.value)}
@@ -227,7 +229,7 @@ export default function CustomerOrder() {
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div className="min-h-0 flex-1 space-y-4 p-4 lg:overflow-y-auto lg:p-5">
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-2">
               <ShoppingBag size={48} className="opacity-20 mb-2" />
@@ -236,19 +238,19 @@ export default function CustomerOrder() {
             </div>
           ) : (
             cart.map(item => (
-              <div key={item.id} className="flex justify-between items-center gap-3 bg-white border border-gray-100 p-3 rounded-xl shadow-sm">
+              <div key={item.id} className="flex justify-between items-center gap-2 bg-white border border-gray-100 p-2 sm:p-3 rounded-xl shadow-sm">
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm text-gray-900 truncate">{item.name}</p>
                   <p className="text-xs font-mono text-gray-500">${(item.price * item.qty).toFixed(2)}</p>
                 </div>
 
                 <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1 shrink-0">
-                  <button onClick={() => updateQty(item.id, -1)} className="p-1 hover:bg-white rounded shadow-sm text-gray-600 transition-colors"><Minus size={14} /></button>
+                  <button onClick={() => updateQty(item.id, -1)} aria-label={`Decrease quantity of ${item.name}`} className="min-h-11 min-w-9 flex items-center justify-center hover:bg-white rounded shadow-sm text-gray-600 transition-colors"><Minus size={14} /></button>
                   <span className="text-sm font-bold w-4 text-center">{item.qty}</span>
-                  <button onClick={() => updateQty(item.id, 1)} className="p-1 hover:bg-white rounded shadow-sm text-gray-600 transition-colors"><Plus size={14} /></button>
+                  <button onClick={() => updateQty(item.id, 1)} aria-label={`Increase quantity of ${item.name}`} className="min-h-11 min-w-9 flex items-center justify-center hover:bg-white rounded shadow-sm text-gray-600 transition-colors"><Plus size={14} /></button>
                 </div>
 
-                <button onClick={() => removeFromCart(item.id)} className="p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors shrink-0">
+                <button onClick={() => removeFromCart(item.id)} aria-label={`Remove ${item.name}`} className="min-h-11 min-w-9 p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors shrink-0">
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -270,10 +272,19 @@ export default function CustomerOrder() {
         </div>
       </div>
 
+      {cart.length > 0 && !showSuccess && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+          <a href="#order-cart" className="flex min-h-12 items-center justify-between gap-3 rounded-xl bg-blue-600 px-4 py-3 font-bold text-white shadow-lg">
+            <span className="flex items-center gap-2"><ShoppingBag size={20} /> View order ({cart.reduce((count, item) => count + item.qty, 0)})</span>
+            <span>${cartTotal.toFixed(2)}</span>
+          </a>
+        </div>
+      )}
+
       {/* SUCCESS POPUP CARD */}
       {showSuccess && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 backdrop-blur-sm">
-          <div className="bg-white px-10 py-8 rounded-3xl shadow-2xl flex flex-col items-center transform transition-all scale-100 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 overflow-y-auto p-4 flex items-center justify-center bg-black/40 z-50 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto px-6 sm:px-10 py-8 rounded-3xl shadow-2xl flex flex-col items-center transform transition-all scale-100 animate-in fade-in zoom-in-95 duration-200">
 
             <div className="flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-5 shadow-inner">
               <CheckCircle size={40} className="text-green-600" strokeWidth={2.5} />
@@ -315,7 +326,7 @@ function MenuCard({ item, onAdd }) {
 
       <div className="relative h-[200px] w-full bg-gray-100 shrink-0 border-b border-gray-100 rounded-t-[14px] overflow-hidden">
         {item.imageUrl ? (
-          <img src={`http://localhost:3000${item.imageUrl}`} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <img src={menuImageURL(item.imageUrl)} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm bg-gray-50 rounded-t-[14px]">No Image</div>
         )}
@@ -333,19 +344,21 @@ function MenuCard({ item, onAdd }) {
           <span className="font-mono text-[17px] font-bold whitespace-nowrap text-gray-900">${Number(item.price).toFixed(2)}</span>
         </div>
 
-        <div
+        <button
+          type="button"
+          aria-expanded={isExpanded}
           onClick={() => setIsExpanded(!isExpanded)}
-          className="mb-4 cursor-pointer group/desc relative"
+          className="mb-4 cursor-pointer group/desc relative text-left"
         >
           <p className={`text-[14px] text-gray-500 leading-relaxed transition-all ${!isExpanded ? 'line-clamp-1' : ''}`}>
             {item.description || "No description available."}
           </p>
           {item.description && item.description.length > 35 && (
-            <span className="text-[11px] text-blue-500 font-medium opacity-0 group-hover/desc:opacity-100 transition-opacity mt-1 inline-block">
-              {isExpanded ? "Show less" : "Click to read more"}
+            <span className="text-[11px] text-blue-500 font-medium opacity-100 transition-opacity mt-1 inline-block">
+              {isExpanded ? "Show less" : "Read more"}
             </span>
           )}
-        </div>
+        </button>
 
         <div className="flex flex-wrap gap-2 mb-5">
           {item.category === 'Burgers' && (

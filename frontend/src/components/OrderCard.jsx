@@ -27,7 +27,7 @@ export default function OrderCard({ order, onMove, onClear }) {
     <div className="bg-white rounded-2xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] border border-gray-100 p-5 flex flex-col">
 
       {/* 1. Header (Exactly matching the image) */}
-      <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+      <div className="flex flex-wrap gap-3 justify-between items-center pb-4 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <span className="font-bold text-gray-900 text-base">#{order.id}</span>
           <span className="px-3 py-1 bg-slate-50 border border-slate-200 text-slate-500 font-medium text-xs rounded-full">

@@ -42,3 +42,7 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+// Images and live updates use the same reachable server as API requests.
+export const serverURL = new URL(api.defaults.baseURL, window.location.origin).origin;
+export const menuImageURL = (path) => new URL(path, `${serverURL}/`).href;

@@ -34,7 +34,7 @@ export default function ModeratorDashboard() {
   };
 
   return (
-    <div className="p-8 bg-slate-50 min-h-screen">
+    <div className="p-4 sm:p-6 lg:p-8 bg-slate-50 min-h-dvh">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Platform Overview</h1>
         <p className="text-slate-500 mt-1">Monitor QuickBite network health and onboard new clients.</p>
@@ -103,7 +103,7 @@ export default function ModeratorDashboard() {
                 type="text"
                 readOnly
                 value={inviteLink}
-                className="flex-1 bg-transparent outline-none text-slate-600 font-mono text-sm"
+                className="min-w-0 flex-1 bg-transparent outline-none text-slate-600 font-mono text-sm"
               />
               <button
                 onClick={copyToClipboard}

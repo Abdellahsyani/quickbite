@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, X, Upload, Search, Star, Leaf, Flame } from 'lucide-react';
-import api from '../api';
+import api, { menuImageURL } from '../api';
 
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
@@ -136,7 +136,7 @@ export default function Menu() {
       category: item.category,
     });
     if (item.imageUrl) {
-      setImagePreview(`http://localhost:3000${item.imageUrl}`);
+      setImagePreview(menuImageURL(item.imageUrl));
     } else {
       setImagePreview(null);
     }
@@ -182,13 +182,13 @@ export default function Menu() {
 
   return (
     // Main Container: Fills the screen, white background for header
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex min-h-full min-w-0 flex-col bg-white">
 
       {/* --- TOP HEADER SECTION --- */}
-      <div className="px-8 py-6 shrink-0">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 shrink-0">
 
         {/* Title & Add Button Row */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
           <div>
             <h1 className="text-[22px] font-bold text-gray-900 leading-tight">Menu Catalog</h1>
             <p className="text-sm text-gray-400 mt-1">
@@ -205,7 +205,7 @@ export default function Menu() {
         </div>
 
         {/* Search & Filter Row */}
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col items-start sm:flex-row sm:items-center gap-4">
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
             <input
@@ -229,12 +229,12 @@ export default function Menu() {
       </div>
 
       {/* --- MAIN CONTENT SPLIT --- */}
-      <div className="flex flex-1 overflow-hidden border-t border-gray-200">
+      <div className="flex min-w-0 flex-1 flex-col xl:flex-row border-t border-gray-200">
 
         {/* Left Sidebar (White background, precise borders) */}
-        <div className="w-60 bg-white border-r border-gray-200 overflow-y-auto py-6 shrink-0">
+        <div className="w-full bg-white border-b xl:border-b-0 xl:border-r border-gray-200 py-3 xl:py-6 shrink-0 xl:w-48">
           <h3 className="text-[11px] font-bold text-gray-400 tracking-wider mb-3 px-6">CATEGORIES</h3>
-          <div className="flex flex-col">
+          <div className="flex gap-2 overflow-x-auto px-4 xl:flex-col xl:px-0">
             {categories.map(cat => {
               const count = getCategoryCount(cat);
               const isActive = activeCategory === cat;
@@ -242,7 +242,7 @@ export default function Menu() {
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`flex justify-between items-center px-6 py-2.5 text-sm transition-colors ${isActive
+                  className={`flex shrink-0 justify-between items-center gap-3 whitespace-nowrap px-4 xl:px-6 py-2.5 text-sm transition-colors ${isActive
                     ? 'border-l-[3px] border-blue-600 bg-blue-50 text-blue-700 font-medium'
                     : 'border-l-[3px] border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
@@ -260,14 +260,14 @@ export default function Menu() {
         </div>
 
         {/* Right Area: Grid Container (Slightly gray background to make cards pop) */}
-        <div className="flex-1 bg-[#f8f9fa] p-8 overflow-y-auto">
+        <div className="min-w-0 flex-1 bg-[#f8f9fa] p-4 sm:p-6 lg:p-8">
           {filteredItems.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300 shadow-sm">
               <p className="text-gray-500 mb-2">No items found.</p>
               <p className="text-sm text-gray-400">Try adjusting your filters or add a new item.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
               {filteredItems.map(item => {
                 const isAvail = item.isAvailable !== false;
                 return (
@@ -277,7 +277,7 @@ export default function Menu() {
                     <div className="relative h-[180px] w-full bg-gray-100 shrink-0 border-b border-gray-100">
                       {item.imageUrl ? (
                         <img
-                          src={`http://localhost:3000${item.imageUrl}`}
+                          src={menuImageURL(item.imageUrl)}
                           alt={item.name}
                           className={`w-full h-full object-cover transition-all ${!isAvail ? 'grayscale opacity-60' : ''}`}
                         />
@@ -291,11 +291,11 @@ export default function Menu() {
                         </span>
                       </div>
 
-                      <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                        <button onClick={() => EditCard(item)} className="p-1.5 bg-white/95 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg shadow-sm border border-gray-100 transition-colors">
+                      <div className="absolute top-3 right-3 flex gap-2 opacity-100 transition-opacity z-20">
+                        <button onClick={() => EditCard(item)} className="min-h-11 min-w-11 flex items-center justify-center p-1.5 bg-white/95 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg shadow-sm border border-gray-100 transition-colors">
                           <Edit size={16} />
                         </button>
-                        <button onClick={() => deletedCard(item.id)} className="p-1.5 bg-white/95 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg shadow-sm border border-gray-100 transition-colors">
+                        <button onClick={() => deletedCard(item.id)} className="min-h-11 min-w-11 flex items-center justify-center p-1.5 bg-white/95 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg shadow-sm border border-gray-100 transition-colors">
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -371,7 +371,7 @@ export default function Menu() {
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
               <h2 className="text-xl font-bold text-gray-900"> {editingItemId ? "Edit Item" : "Add New Item"}</h2>
               <button
                 onClick={() => {
@@ -412,7 +412,7 @@ export default function Menu() {
                 <input type="text" required className="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Double Cheeseburger" />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
                   <input type="number" step="0.01" required className="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} placeholder="12.50" />

@@ -15,7 +15,7 @@ export default function Register() {
   if (!token) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <div className="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 max-w-lg text-center">
+        <div className="bg-white p-5 sm:p-10 rounded-3xl shadow-xl border border-slate-100 max-w-lg text-center">
           <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Store size={32} className="text-blue-600" />
           </div>
@@ -47,7 +47,7 @@ export default function Register() {
   // 3. IF TOKEN IS PRESENT: Show the registration form
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-5 sm:p-8">
 
         <h2 className="text-3xl font-bold text-slate-900 mb-2">Setup Account</h2>
         <p className="text-slate-500 font-medium mb-8">Welcome to QuickBite. Enter your details to claim your admin account.</p>

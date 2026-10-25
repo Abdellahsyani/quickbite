@@ -51,7 +51,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
+    <div className="min-h-dvh bg-slate-50 p-4 sm:p-6 lg:p-8">
 
       {/* Header */}
       <header className="mb-8">
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
       </header>
 
       {/* Top Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
 
         <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
           <div className="flex justify-between items-start">
@@ -113,11 +113,11 @@ export default function AdminDashboard() {
       </div>
 
       {/* Bottom Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
         {/* Recent Transactions Table */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+        <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+          <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-wrap gap-3 justify-between items-center">
             <h3 className="font-bold text-lg text-slate-900">Recent Transactions</h3>
             <button className="text-sm font-medium text-blue-600 hover:text-blue-800">View All</button>
           </div>

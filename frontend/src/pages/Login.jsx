@@ -43,7 +43,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-5 sm:p-8">
 
         <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
           <Lock size={32} className="text-blue-600" />

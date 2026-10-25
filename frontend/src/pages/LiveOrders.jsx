@@ -2,7 +2,7 @@ import { Pause } from 'lucide-react';
 import OrderCard from '../components/OrderCard';
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import api from '../api';
+import api, { serverURL } from '../api';
 
 export default function LiveOrders() {
   // Renamed to setOrders (plural) to match the array
@@ -20,7 +20,7 @@ export default function LiveOrders() {
 
   // Refresh on each connection to recover orders missed while disconnected.
   useEffect(() => {
-    const socket = io('http://localhost:3000', {
+    const socket = io(serverURL, {
       auth: { token: localStorage.getItem('token') },
     });
     fetchOrders();
@@ -81,10 +81,10 @@ export default function LiveOrders() {
   const completed = orders.filter(o => o.status === 'COMPLETED');
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
 
       {/* --- HEADER SECTION (Unchanged) --- */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
             Live Orders <span className="text-gray-400 font-normal">/ KDS</span>
@@ -93,7 +93,7 @@ export default function LiveOrders() {
             {orders.length} active orders • Last refreshed just now
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           <span className="px-4 py-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-full">
             Accepting Orders
           </span>
@@ -105,7 +105,7 @@ export default function LiveOrders() {
       </div>
 
       {/* --- KANBAN BOARD SECTION --- */}
-      <div className="grid grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-start">
 
         {/* 1. PENDING COLUMN */}
         <div className="flex flex-col gap-4">
