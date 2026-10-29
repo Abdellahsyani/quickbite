@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 1. Create a custom Axios instance with backend URL
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://10.32.131.240:3000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://10.42.0.1:3000/api",
 });
 
 // 2. Add the Interceptor

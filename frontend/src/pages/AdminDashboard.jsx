@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DollarSign, ShoppingBag, TrendingUp, Clock, Utensils, ArrowUpRight } from 'lucide-react';
 import api from '../api';
+import RestaurantQRCode from "../components/RestaurantQRCode";
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
@@ -188,6 +189,7 @@ export default function AdminDashboard() {
               ))
             )}
           </div>
+          <RestaurantQRCode />
         </div>
 
       </div>

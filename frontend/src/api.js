@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 1. Create a custom Axios instance with backend URL
 const api = axios.create({
-  baseURL: "http://10.32.131.240:3000/api",
+  baseURL: "http://10.42.0.1:3000/api",
 });
 
 // 2. Add the Interceptor
@@ -44,5 +44,6 @@ api.interceptors.response.use(
 export default api;
 
 // Images and live updates use the same reachable server as API requests.
-export const serverURL = new URL(api.defaults.baseURL, window.location.origin).origin;
+export const serverURL = new URL(api.defaults.baseURL, window.location.origin)
+  .origin;
 export const menuImageURL = (path) => new URL(path, `${serverURL}/`).href;
