@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { DollarSign, ShoppingBag, TrendingUp, Clock, Utensils, ArrowUpRight } from 'lucide-react';
 import api from '../api';
 import RestaurantQRCode from "../components/RestaurantQRCode";
+import { Link } from 'react-router-dom';
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
@@ -55,9 +56,22 @@ export default function AdminDashboard() {
     <div className="min-h-dvh bg-slate-50 p-4 sm:p-6 lg:p-8">
 
       {/* Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Analytics Overview</h1>
-        <p className="text-slate-500 mt-1">Track your restaurant's performance and sales.</p>
+      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            Analytics Overview
+          </h1>
+          <p className="mt-1 text-slate-500">
+            Track your restaurant's performance and sales.
+          </p>
+        </div>
+
+        <Link
+          to="/restaurant-qr"
+          className="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+        >
+          Generate restaurant QR
+        </Link>
       </header>
 
       {/* Top Metrics Row */}
@@ -189,7 +203,6 @@ export default function AdminDashboard() {
               ))
             )}
           </div>
-          <RestaurantQRCode />
         </div>
 
       </div>

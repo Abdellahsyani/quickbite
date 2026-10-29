@@ -10,6 +10,7 @@ import TrackOrder from './pages/TrackOrder';
 import AdminDashboard from './pages/AdminDashboard';
 import StaffManagement from './pages/stuffManagement';
 import ModeratorDashboard from './pages/ModeratorDashboard';
+import RestaurantQRPage from './pages/RestaurantQRPage';
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="moderator" element={<ModeratorDashboard />} />
         </Route>
 
+
         {/* --- 2. STAFF LAYOUT (The shared sidebar/header) --- */}
         <Route path="/" element={<Layout />}>
 
@@ -39,6 +41,7 @@ export default function App() {
             <Route path="menu" element={<Menu />} />
             <Route path="AdminDashboard" element={<AdminDashboard />} />
             <Route path="staff" element={<StaffManagement />} />
+            <Route path="restaurant-qr" element={<RestaurantQRPage />} />
           </Route>
 
         </Route>
