@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, UtensilsCrossed } from "lucide-react";
 import api from "../api";
 import RestaurantQRCode from "../components/RestaurantQRCode";
+import { useEffect, useRef, useState } from "react";
+import { toPng } from "html-to-image";
 
 export default function RestaurantQRPage() {
   const [restaurant, setRestaurant] = useState(null);
   const [error, setError] = useState("");
+  const cardRef = useRef(null);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -28,6 +32,36 @@ export default function RestaurantQRPage() {
 
     return () => controller.abort();
   }, []);
+
+  const downloadCard = async () => {
+    if (!cardRef.current || !restaurant || downloading) return;
+
+    setDownloading(true);
+    setDownloadError("");
+
+    try {
+      // Wait for fonts before capturing the card.
+      await document.fonts.ready;
+
+      const imageURL = await toPng(cardRef.current, {
+        pixelRatio: 3,
+        backgroundColor: "#ffffff",
+      });
+
+      const link = document.createElement("a");
+      link.href = imageURL;
+      link.download = `restaurant-${restaurant.id}-menu-qr.png`;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("QR download failed:", err);
+      setDownloadError("Unable to download the QR card. Please try again.");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div className="min-h-full bg-slate-50 px-4 py-6 sm:px-8 sm:py-10">
@@ -61,7 +95,7 @@ export default function RestaurantQRPage() {
             Loading your restaurant…
           </p>
         ) : (
-          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <section ref={cardRef} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div className="h-2 bg-blue-600" />
 
             <div className="px-6 py-10 text-center sm:px-10">
@@ -97,6 +131,24 @@ export default function RestaurantQRPage() {
               </p>
             </div>
           </section>
+        )}
+        {restaurant && (
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={downloadCard}
+              disabled={downloading}
+              className="w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
+            >
+              {downloading ? "Preparing image…" : "Download QR card"}
+            </button>
+
+            {downloadError && (
+              <p role="alert" className="mt-3 text-sm text-red-600">
+                {downloadError}
+              </p>
+            )}
+          </div>
         )}
       </div>
     </div>

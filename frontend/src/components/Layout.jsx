@@ -20,7 +20,7 @@ export default function Layout() {
   }, [role]);
 
   const brandName = ['admin', 'staff'].includes(role)
-    ? restaurantName || 'Restaurant'
+    ? restaurantName
     : 'QuickBite';
 
   const location = useLocation();
