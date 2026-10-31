@@ -18,7 +18,11 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://10.32.131.240:5173", "http://10.32.131.240:3000"],
+    origin: [
+      "http://10.32.131.240:5173",
+      "http://10.32.131.240:3000",
+      "https://quickbite-livid.vercel.app",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   },
@@ -69,7 +73,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin: ["http://10.32.131.240:5173", "http://10.32.131.240:3000"],
+    origin: [
+      "http://10.32.131.240:5173",
+      "http://10.32.131.240:3000",
+      "https://quickbite-livid.vercel.app",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
